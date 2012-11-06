@@ -15,6 +15,18 @@ describe MemoryModel::Base do
       klass.send :field, :name
       klass.fields.should include(:name)
     end
+
+    it "should respond to field" do
+      klass.send :field, :name
+      klass.new.should respond_to :name
+    end
+
+    it "should have a field with a value" do
+      klass.send :field, :name
+      instance = klass.new(name: "Bob")
+      instance.send(:name).should == "Bob"
+    end
+
   end
 
   describe ".create" do
@@ -28,6 +40,12 @@ describe MemoryModel::Base do
   end
 
   context "Instance Methods" do
+    let!(:klass) do
+      Class.new(MemoryModel::Base) do
+        field :first_name
+        field :last_name
+      end
+    end
     let(:instance){ klass.new }
 
     describe "#save" do
@@ -35,6 +53,13 @@ describe MemoryModel::Base do
       it "Should save to the collection" do
         instance.save
         klass.collection.should include(instance)
+      end
+    end
+
+    describe "#first_name=" do
+      it "sets a value" do
+        instance.first_name = "John"
+        instance.first_name.should == "John"
       end
     end
 

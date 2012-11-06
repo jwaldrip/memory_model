@@ -1,5 +1,7 @@
 module MemoryModel::Base::ClassMethods
 
+  delegate *(Array.instance_methods - Object.instance_methods), to: :all
+
   def inherited(subclass)
     MemoryModel.tables << subclass
   end
@@ -8,7 +10,12 @@ module MemoryModel::Base::ClassMethods
     options.assert_valid_keys(:default)
     self.fields << name
     self.field_options[name] = options
+    define_attribute_methods [name, :"#{name}="] unless instance_method_already_implemented? name
     name
+  end
+
+  def all
+    collection.to_a
   end
 
   def create(attrs={})
@@ -21,7 +28,7 @@ module MemoryModel::Base::ClassMethods
   end
 
   def next_id
-    last = collection.last
+    last = collection.to_a.last
     last ? last[:id] + 1 : 1
   end
 
