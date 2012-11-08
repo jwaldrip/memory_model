@@ -1,7 +1,9 @@
-class MemoryModel::Base < Hash
+class MemoryModel::Base < HashWithIndifferentAccess
   extend ActiveSupport::Autoload
+
+  # Autoloads
   autoload :ClassMethods
-  extend ClassMethods
+  autoload :Attributes
 
   # Active Model
   extend  ActiveModel::Naming
@@ -17,92 +19,42 @@ class MemoryModel::Base < Hash
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
+  # Memory Model
+  extend ClassMethods
+  include Attributes
+  include MemoryModel::Associations
+
   # Set Up Callbacks
   define_model_callbacks :create, :save, :destroy, :update, :initialize
 
   class_attribute :field_options, :fields, :collection, instance_writer: false
 
+  private :field_options, :fields, :collection
+
+  [:merge!, :merge].each { |method| undef_method method }
+
   self.collection = Set.new
   self.fields = Set.new
-  self.field_options = {}
+  self.field_options = HashWithIndifferentAccess.new
 
   field :id
 
   alias :klass :class
 
   def initialize(attrs={})
-    attributes = fields.reduce({}) do |fields, key|
-      fields[key] = nil
-      fields
-    end
-    super.merge!(attributes_with_defaults.merge(attrs))
-  end
-
-  def merge(attrs={})
-    attrs.assert_valid_keys(*fields)
-    super
-  end
-
-  def merge!(attrs={})
-    attrs.assert_valid_keys(*fields)
-    super
-  end
-
-  alias_method :attributes= ,:merge!
-
-  def []=(key, value)
-    { key.to_sym => value }.assert_valid_keys(*fields)
-    super
+    self.attributes = attributes_with_defaults.merge(attrs)
   end
 
   def save
-    instance = self.collection.find{ |item| item[:id] == self[:id] } || self.merge!({ id: klass.next_id })
-    self.collection << saved_instance = instance.dup
-    saved_instance
-  end
-
-  def attribute(key, value=nil)
-    if /(?<key>.*)=$/ =~ key
-      self[key] = value
+    found_instance = collection.find{ |item| item.id == id }
+    if found_instance
+      instance = found_instance.attributes=(self)
     else
-      attributes[key]
+      self.attributes = { id: klass.next_id }
+      collection << instance = self.dup
     end
-  end
 
-  def attributes
-    self.reduce(HashWithIndifferentAccess.new) do |attributes, (key, value)|
-      attributes[key] = value
-      attributes
-    end
-  end
-
-  def inspect
-    inspection = attributes.map do |key, value|
-      "#{key}: #{attribute_for_inspect(key)}"
-    end.join(", ")
-    "#<#{self.class} #{inspection}>"
-  end
-
-  private
-
-  def attributes_with_defaults
-    self.reduce(HashWithIndifferentAccess.new) do |attributes, (key, value)|
-      attributes[key] = value
-      attributes
-    end
-  end
-
-  def attribute_missing(match, *args, &block)
-    self[match]
-  end
-
-  def attribute_for_inspect(attr)
-    value = attributes[attr]
-    if value.is_a?(String) && value.length > 50
-      "#{value[0..50]}...".inspect
-    else
-      value.inspect
-    end
+    instance
   end
 
 end

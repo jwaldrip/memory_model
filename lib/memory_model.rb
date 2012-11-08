@@ -6,6 +6,7 @@ module MemoryModel
   extend ActiveSupport::Autoload
 
   autoload :Base
+  autoload :Associations
 
   mattr_accessor :tables
   self.tables = []
