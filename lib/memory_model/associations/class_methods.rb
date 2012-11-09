@@ -3,16 +3,15 @@ module MemoryModel::Associations::ClassMethods
   Base = MemoryModel::Associations::Base
 
   def belongs_to(name, options={})
-    field options[:foreign_key] || "#{name}_id"
-    Base.new(self, name, :instance, options)
+    Base.belongs_to(self, name, options)
   end
 
   def has_one(name, options={})
-    Base.new(self, name, :instance, options)
+    Base.has_one(self, name, options)
   end
 
   def has_many(name, options={})
-    Base.new(self, name, :collection, options)
+    Base.has_many(self, name, options)
   end
 
 end

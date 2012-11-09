@@ -4,6 +4,23 @@ class MemoryModel::Associations::Base
 
   attr_reader :owner_class, :name, :type, :options
 
+  class << self
+
+    def belongs_to(owner, name, options={})
+      owner.send :field, options[:foreign_key] || "#{name}_id"
+      new owner, name, :instance, options
+    end
+
+    def has_one(owner, name, options={})
+      new owner, name, :instance, options
+    end
+
+    def has_many(owner, name, options={})
+      new owner, name, :collection, options
+    end
+
+  end
+
   def initialize(owner, name, type, options={})
     @owner_class = owner
     @name        = name
@@ -12,26 +29,17 @@ class MemoryModel::Associations::Base
     owner_class.associations = owner_class.associations + Array.wrap(self)
   end
 
-  def set_association(parent, instance)
-    if instance? && parent?
-      parent.update(foreign_key => instance.id)
-
-    elsif instance? && child?
-      existing = klass.all.select{ |item| item.send foreign_key == parent.id }
-      existing.each { |item| item.update(foreign_key => nil) }
-      instance.update(foreign_key => parent.id)
+  def set_association(parent, object)
+    if instance?
+      set_instance(parent, object)
 
     elsif collection? && parent?
-      instance.map do |item|
-        raise "Invalid Class" unless item.is_a?(klass)
-        item.send("#{foreign_key}=", parent.id)
-      end
+      set_collection(parent, object)
+
     else
       raise "Invalid Association!"
 
     end
-
-    instance
   end
 
   def load_association(parent)
@@ -57,6 +65,15 @@ class MemoryModel::Associations::Base
 
   private
 
+  # Modifiers
+
+  def unassociate_parent_from_all(parent)
+    existing = klass.all.select{ |item| item.send(foreign_key) == parent.id }
+    existing.each { |item| item.update(foreign_key => nil) }
+  end
+
+  # Conditionals
+
   def parent?
     klass.fields.include?(foreign_key)
   end
@@ -72,6 +89,35 @@ class MemoryModel::Associations::Base
   def collection?
     type == :collection
   end
+
+  # Setters
+
+  def set_collection(parent, collection)
+    unassociate_parent_from_all(parent)
+    collection.map do |item|
+      raise "Invalid Class" unless item.is_a?(klass)
+      item.send("#{foreign_key}=", parent.id)
+    end
+  end
+
+  def set_instance(parent, instance)
+    raise "Invalid Class" unless instance.is_a?(klass)
+
+    if parent?
+      instance.save
+      parent.update(foreign_key => instance.id)
+
+    else child?
+      unassociate_parent_from_all(parent)
+      instance.update(foreign_key => parent.id)
+
+    end
+
+    instance
+
+  end
+
+  # Getters
 
   def load_collection(parent)
     Proxy.new(self, parent)

@@ -46,8 +46,7 @@ class MemoryModel::Base < HashWithIndifferentAccess
   end
 
   def save
-    found_instance = collection.find{ |item| item.id == id }
-    if found_instance
+    if (found_instance = klass.collection.find { |item| item.id == id })
       instance = found_instance.attributes=(self)
     else
       self.attributes = { id: klass.next_id }
@@ -55,6 +54,10 @@ class MemoryModel::Base < HashWithIndifferentAccess
     end
 
     instance
+  end
+
+  def reload!
+    self.replace klass.find(id)
   end
 
 end

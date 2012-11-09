@@ -16,6 +16,24 @@ describe MemoryModel::Base do
       end
     end
 
+    describe "#reload" do
+
+      let!(:klass) do
+        Class.new(MemoryModel::Base) do
+          field :name
+        end
+      end
+      let(:instance){ klass.create }
+
+      it "Should reload the object" do
+        dup_instance = klass.find(instance.id)
+        dup_instance.update({ name: "Jason" })
+        instance.reload!
+        instance.should == dup_instance
+      end
+
+    end
+
   end
 
 
