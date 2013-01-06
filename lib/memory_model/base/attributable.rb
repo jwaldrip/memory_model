@@ -1,5 +1,6 @@
 module MemoryModel::Base::Attributable
   extend ActiveSupport::Concern
+  include ActiveModel::AttributeMethods
 
   included do
     attr_reader :attributes
