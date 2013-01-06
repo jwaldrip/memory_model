@@ -1,11 +1,18 @@
 require 'active_support/concern'
 require 'active_support/dependencies/autoload'
+require 'securerandom'
 
-module MemoryModel::Base::Fields
+module MemoryModel::Base::Fieldable
+  extend ConcernedInheritance
   extend ActiveSupport::Concern
   extend ActiveSupport::Autoload
   autoload :FieldSet
   autoload :Field
+
+  inherited do
+    instance_variable_set :@fields, baseclass.fields
+    field :id, readonly: true, default: -> { SecureRandom.uuid }, comparable: false
+  end
 
   module ClassMethods
 

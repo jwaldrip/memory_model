@@ -1,4 +1,5 @@
 require "memory_model/version"
+require "memory_model/core_ext/object"
 
 module MemoryModel
   autoload :Collection, 'memory_model/collection'

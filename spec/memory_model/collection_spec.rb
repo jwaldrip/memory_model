@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe MemoryModel::Collection do
 
-  let(:klass){ MemoryModel::Collection }
-  let(:model){ Class.new(MemoryModel::Base) }
-  subject(:collection){ model.send :collection }
+  let(:klass) { MemoryModel::Collection }
+  let(:model) { Class.new(MemoryModel::Base) }
+  subject(:collection) { model.collection }
 
   describe '.new' do
     it 'should be empty' do
@@ -18,7 +18,7 @@ describe MemoryModel::Collection do
 
   describe '.all' do
     it 'should be a set' do
-      klass.all.should be_a Set
+      klass.all.should be_a Array
     end
   end
 
@@ -109,12 +109,63 @@ describe MemoryModel::Collection do
     end
   end
 
+  describe "#insert" do
+    it 'should raise an error for an invalid object' do
+      expect { collection.insert Object.new }.to raise_error MemoryModel::Collection::InvalidTypeError
+    end
+
+    it 'should duplicate a record being inserted' do
+      instance = model.new
+      instance.should_receive :dup
+      collection.insert instance
+    end
+
+    it 'should freeze a record being inserted' do
+      instance = model.new
+      collection.insert instance
+      collection.last.should == instance
+      collection.records(false).last.should be_frozen
+    end
+  end
+
   describe '#inspect' do
     it 'should delegate inspect to all' do
       all_mock = mock
       all_mock.should_receive(:inspect)
       collection.stub(:all).and_return(all_mock)
       collection.inspect
+    end
+  end
+
+  describe '#records' do
+    let(:mock_record) do
+      mock_record = mock
+      mock_record.stub(:deleted?).and_return(false)
+      mock_record
+    end
+
+    before(:each) do
+      collection.instance_variable_set :@records, [mock_record]
+    end
+
+    it 'should dup records' do
+      mock_record.should_receive(:dup)
+      collection.records
+    end
+
+    it 'should not dup records' do
+      mock_record.should_not_receive(:dup)
+      collection.records(false)
+    end
+  end
+
+  describe '#records' do
+    it 'should contain unfrozen duplicates' do
+      3.times { model.new.commit }
+      collection.records.each do |record|
+        record.should_not be_frozen
+      end
+      collection.records.size.should == 3
     end
   end
 
@@ -136,13 +187,12 @@ describe MemoryModel::Collection do
     end
   end
 
-  describe '#records' do
-    it 'should contain unfrozen duplicates' do
-      3.times { model.new.commit }
-      collection.records.each do |record|
-        record.should_not be_frozen
-      end
-      collection.records.size.should == 3
+  describe 'sorted' do
+    it 'should be sorted by timestamp, with most recent first' do
+      item_1 = model.new.commit
+      item_2 = model.new.commit
+      collection[1].should == item_1
+      collection[0].should == item_2
     end
   end
 
@@ -157,12 +207,6 @@ describe MemoryModel::Collection do
     it 'should call sorted' do
       collection.should_receive(:sorted).and_return([])
       collection.send(:unique)
-    end
-  end
-
-  describe 'sorted' do
-    it 'should be sorted by timestamp' do
-
     end
   end
 
