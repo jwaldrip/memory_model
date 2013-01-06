@@ -17,7 +17,6 @@ class MemoryModel::Base
   autoload :Versionable
 
   # Active Model Additions
-  include ActiveModel::AttributeMethods
 
   # Memory Model Additions
   include Fieldable
