@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = %w{lib}
 
   gem.add_development_dependency 'activesupport'
+  gem.add_development_dependency 'activemodel'
   gem.add_development_dependency 'guard-rspec'
   gem.add_development_dependency 'rb-fsevent'
   gem.add_development_dependency 'rspec'
