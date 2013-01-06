@@ -23,4 +23,15 @@ describe MemoryModel::Base::Persistence do
     end
   end
 
+  describe '#new_record?' do
+    it 'should be true unless persisted' do
+      instance.commit
+      instance.new_record?.should be_false
+    end
+
+    it 'should be false unless not persisted' do
+      instance.new_record?.should be_true
+    end
+  end
+
 end
