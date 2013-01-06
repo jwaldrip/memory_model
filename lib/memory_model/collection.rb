@@ -31,7 +31,7 @@ class MemoryModel::Collection
     if !record.deleted? || (return_deleted && record.deleted?)
       record
     else
-      nil
+      raise MemoryModel::RecordNotFoundError
     end
   end
 

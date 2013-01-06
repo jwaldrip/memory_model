@@ -8,5 +8,6 @@ module MemoryModel
   class InvalidCollectionError < StandardError ; end
   class InvalidFieldError < StandardError ; end
   class ReadonlyFieldError < StandardError ; end
+  class RecordNotFoundError < StandardError ; end
 
 end
