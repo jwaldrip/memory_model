@@ -5,6 +5,7 @@ module MemoryModel::Base::Attributable
     attr_reader :attributes
     delegate :to_hash, to: :attributes
     attribute_method_affix :prefix => 'reset_', :suffix => '_to_default!'
+    attribute_method_prefix 'clear_'
   end
 
   def has_attribute?(key)
@@ -60,6 +61,10 @@ module MemoryModel::Base::Attributable
 
   def reset_attribute_to_default!(attr)
     write_attribute attr, fields.default_values(self).with_indifferent_access[attr]
+  end
+
+  def clear_attribute(attr)
+    write_attribute attr, nil
   end
 
 end

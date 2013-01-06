@@ -119,4 +119,18 @@ describe MemoryModel::Base::Attributable do
     end
   end
 
+  describe '#clear_attribute' do
+    let(:klass) do
+      Class.new(MemoryModel::Base) do
+        field :foo
+      end
+    end
+    it 'should reset an attribute to its default value' do
+      instance.foo = 'baz'
+      instance.foo.should == 'baz'
+      instance.clear_foo
+      instance.foo.should be_nil
+    end
+  end
+
 end
