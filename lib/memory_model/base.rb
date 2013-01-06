@@ -15,8 +15,11 @@ class MemoryModel::Base
   autoload :Actionable
   autoload :Attributable
   autoload :Versionable
+  autoload :Persistence
 
   # Active Model Additions
+  extend ActiveModel::Callbacks
+  include ActiveModel::Conversion
 
   # Memory Model Additions
   include Fieldable
@@ -25,6 +28,10 @@ class MemoryModel::Base
   include Actionable
   include Attributable
   include Versionable
+  include Persistence
+
+  # Active Model Callbacks
+  define_model_callbacks :initialize, only: [:after]
 
   def initialize(attributes={ })
     unless self.class.collection.is_a? MemoryModel::Collection
@@ -32,6 +39,7 @@ class MemoryModel::Base
     end
     @attributes = fields.default_values(self, attributes).with_indifferent_access
     @deleted    = false
+    run_callbacks :initialize
   end
 
 end
