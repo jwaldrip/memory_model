@@ -105,4 +105,18 @@ describe MemoryModel::Base::Attributable do
     end
   end
 
+  describe '#reset_attribute_to_default' do
+    let(:klass) do
+      Class.new(MemoryModel::Base) do
+        field :foo, default: 'bar'
+      end
+    end
+    it 'should reset an attribute to its default value' do
+      instance.foo = 'baz'
+      instance.foo.should == 'baz'
+      instance.reset_foo_to_default!
+      instance.foo.should == 'bar'
+    end
+  end
+
 end

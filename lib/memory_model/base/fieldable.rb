@@ -17,6 +17,7 @@ module MemoryModel::Base::Fieldable
   module ClassMethods
 
     def field(attr, options={ })
+      define_attribute_method attr unless instance_method_already_implemented? attr
       fields.add(attr.to_sym, options)
       class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{attr}

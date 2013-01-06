@@ -3,6 +3,7 @@ require 'active_support/core_ext/object'
 require 'active_support/core_ext/hash'
 require 'active_support/dependencies/autoload'
 require 'active_support/core_ext/hash/indifferent_access'
+require 'active_model'
 
 class MemoryModel::Base
   extend ActiveSupport::Autoload
@@ -15,6 +16,10 @@ class MemoryModel::Base
   autoload :Attributable
   autoload :Versionable
 
+  # Active Model Additions
+  include ActiveModel::AttributeMethods
+
+  # Memory Model Additions
   include Fieldable
   include Collectable
   include Comparable
