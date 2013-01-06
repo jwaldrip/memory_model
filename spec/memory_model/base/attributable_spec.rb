@@ -2,14 +2,14 @@ require 'spec_helper'
 
 describe MemoryModel::Base::Attributable do
 
-  let(:klass) do
+  let(:model) do
     Class.new(MemoryModel::Base) do
       field :foo
       field :bar
     end
   end
   let(:instance) do
-    klass.new
+    model.new
   end
 
   describe '#any_field_name' do
@@ -62,7 +62,7 @@ describe MemoryModel::Base::Attributable do
     end
 
     it 'should read not initialized' do
-      klass.allocate.inspect.should match /not initialized/
+      model.allocate.inspect.should match /not initialized/
     end
   end
 
@@ -106,7 +106,7 @@ describe MemoryModel::Base::Attributable do
   end
 
   describe '#reset_attribute_to_default' do
-    let(:klass) do
+    let(:model) do
       Class.new(MemoryModel::Base) do
         field :foo, default: 'bar'
       end
@@ -120,7 +120,7 @@ describe MemoryModel::Base::Attributable do
   end
 
   describe '#clear_attribute' do
-    let(:klass) do
+    let(:model) do
       Class.new(MemoryModel::Base) do
         field :foo
       end

@@ -5,6 +5,9 @@ describe MemoryModel::Collection do
   let(:klass) { MemoryModel::Collection }
   let(:model) { Class.new(MemoryModel::Base) }
   subject(:collection) { model.collection }
+  before(:each) do
+    stub_const('MyModel', model)
+  end
 
   describe '.new' do
     it 'should be empty' do
@@ -77,7 +80,7 @@ describe MemoryModel::Collection do
     it 'should not return a deleted object' do
       instance = model.new
       instance.commit.delete
-      collection.find(instance.id)
+      expect { collection.find(instance.id) }.to raise_error MemoryModel::RecordNotFoundError
     end
 
     context 'with the deleted option' do
@@ -103,7 +106,7 @@ describe MemoryModel::Collection do
       it 'should return previous version of a deleted object' do
         instance = model.new
         instance.commit.delete
-        collection.find(instance.id).should be_nil
+        expect { collection.find(instance.id) }.to raise_error MemoryModel::RecordNotFoundError
         collection.find(instance.id, version: 1).should be_present
       end
     end

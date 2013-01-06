@@ -1,22 +1,25 @@
 require 'spec_helper'
 
 describe MemoryModel::Base::Actionable do
-  let(:klass) do
-    Class.new MemoryModel::Base do
+  let(:model) do
+    Class.new(MemoryModel::Base) do
       field :foo
     end
   end
   let(:value) { 'bar' }
-  subject(:instance) { klass.new(foo: value) }
+  subject(:instance) { model.new(foo: value) }
+  before(:each) do
+    stub_const('MyModel', model)
+  end
 
   describe '#commit' do
     it 'should save to the collection' do
-      expect { instance.commit }.to change { klass.all }
+      expect { instance.commit }.to change { model.all }
     end
 
     it 'should always be the latest record' do
       instance.commit
-      instance.commit.timestamp.should == klass.find(instance.id).timestamp
+      instance.commit.timestamp.should == model.find(instance.id).timestamp
     end
 
     it 'should have a timestamp' do
@@ -49,6 +52,15 @@ describe MemoryModel::Base::Actionable do
         instance.commit
         instance.deleted_at.should be_nil
       end
+    end
+  end
+
+  describe '#destroy' do
+    it 'should run a before callback' do
+      #model.before_destroy do
+      #  puts 'destroying'
+      #end
+      instance.commit
     end
   end
 

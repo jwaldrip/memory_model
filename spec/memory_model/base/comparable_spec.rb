@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 describe MemoryModel::Base::Comparable do
-  let(:klass) do
-    Class.new MemoryModel::Base do
+  let(:model) do
+    Class.new(MemoryModel::Base) do
       field :foo
     end
   end
   let(:value) { 'bar' }
-  subject(:instance) { klass.new(foo: value) }
+  subject(:instance) { model.new(foo: value) }
 
   describe '#!=' do
     context 'given a symbolized hash' do
@@ -35,8 +35,8 @@ describe MemoryModel::Base::Comparable do
     end
 
     context 'given an instance of the same class' do
-      let(:valid_instance) { klass.new(foo: value) }
-      let(:invalid_instance) { klass.new(foo: 'baz') }
+      let(:valid_instance) { model.new(foo: value) }
+      let(:invalid_instance) { model.new(foo: 'baz') }
       it 'should be true when given a valid instance' do
         (instance != valid_instance).should be_false
       end
@@ -86,8 +86,8 @@ describe MemoryModel::Base::Comparable do
     end
 
     context 'given an instance of the same class' do
-      let(:valid_instance) { klass.new(foo: value) }
-      let(:invalid_instance) { klass.new(foo: 'baz') }
+      let(:valid_instance) { model.new(foo: value) }
+      let(:invalid_instance) { model.new(foo: 'baz') }
       it 'should be true when given a valid instance' do
         (instance == valid_instance).should be_true
       end
@@ -120,8 +120,8 @@ describe MemoryModel::Base::Comparable do
     end
 
     context 'given an instance of the same class' do
-      let(:valid_instance) { klass.new(foo: value) }
-      let(:invalid_instance) { klass.new(foo: 'baz') }
+      let(:valid_instance) { model.new(foo: value) }
+      let(:invalid_instance) { model.new(foo: 'baz') }
       it 'should be true when given a valid instance' do
         (instance === valid_instance).should be_true
       end
@@ -132,9 +132,9 @@ describe MemoryModel::Base::Comparable do
     end
 
     context 'given an instance of an inherited class' do
-      let(:inherited_klass) { Class.new(klass) }
-      let(:valid_instance) { inherited_klass.new(foo: value) }
-      let(:invalid_instance) { inherited_klass.new(foo: 'baz') }
+      let(:inherited_model) { Class.new(model) }
+      let(:valid_instance) { inherited_model.new(foo: value) }
+      let(:invalid_instance) { inherited_model.new(foo: 'baz') }
       it 'should be true when given a valid instance' do
         (instance === valid_instance).should be_true
       end
