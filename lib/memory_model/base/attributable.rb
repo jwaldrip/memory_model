@@ -1,6 +1,7 @@
 module MemoryModel::Base::Attributable
   extend ActiveSupport::Concern
   include ActiveModel::AttributeMethods
+  include ActiveModel::Dirty
 
   included do
     attr_reader :attributes
@@ -30,16 +31,20 @@ module MemoryModel::Base::Attributable
     "#<#{self.class} #{inspection}>"
   end
 
-  def read_attribute(key)
-    @attributes[key]
+  def read_attribute(name)
+    @attributes[name]
   end
 
   alias :[] :read_attribute
 
-  def write_attribute(key, value)
-    raise MemoryModel::InvalidFieldError, "#{key} is not a valid field" unless fields.include? key
-    raise MemoryModel::FieldReadOnlyError, "#{key} is read only" if fields[key].options[:readonly]
-    @attributes[key] = value
+  def write_attribute(name, value)
+    raise MemoryModel::InvalidFieldError,
+          "#{name} is not a valid field" unless fields.include? name
+    raise MemoryModel::FieldReadOnlyError,
+          "#{name} is read only" if fields[name].options[:readonly]
+
+    send "#{name}_will_change!" unless value == read_attribute(name) || new_record?
+    @attributes[name] = value
   end
 
   alias :[]= :write_attribute
