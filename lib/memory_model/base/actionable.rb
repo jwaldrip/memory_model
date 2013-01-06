@@ -5,6 +5,7 @@ module MemoryModel::Base::Actionable
   extend ActiveSupport::Concern
 
   included do
+    define_model_callbacks :create, :update, :save, :destroy
     attr_reader :timestamp
   end
 
@@ -36,16 +37,18 @@ module MemoryModel::Base::Actionable
     deleted? ? @timestamp : nil
   end
 
+  def destroy
+    run_callbacks :destroy do
+      delete
+    end
+  end
+
   def dup
     deep_dup
   end
 
   def deep_dup
     Marshal.load Marshal.dump self
-  rescue # this is to handle anonymous classes
-    temp_class_id = [:TEMP, self.class.object_id.to_s(36)].join('_')
-    MemoryModel::Base.const_set temp_class_id, self.class
-    deep_dup
   end
 
   def freeze
@@ -57,11 +60,36 @@ module MemoryModel::Base::Actionable
     super
   end
 
+  def save
+    callback = persisted? ? :update : :create
+    run_callbacks callback do
+      run_callbacks :save do
+        commit
+      end
+    end
+  end
+
   def restore
     instance = frozen? ? self.dup : self
     instance.instance_variable_set :@deleted, false
-    instance.commit
+    instance.save
     instance
+  end
+
+  module ClassMethods
+
+    def create(attributes={})
+      new(attributes).save
+    end
+
+    def delete_all
+      all.map(&:delete).reject(&:deleted?).empty?
+    end
+
+    def destroy_all
+      all.map(&:destroy).reject(&:deleted?).empty?
+    end
+
   end
 
 end
