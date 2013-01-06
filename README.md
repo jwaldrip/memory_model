@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jwaldrip/memory_model.png?branch=master)](https://travis-ci.org/jwaldrip/memory_model)
+
 # MemoryModel
 
 TODO: Write a gem description
