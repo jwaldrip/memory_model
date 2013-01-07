@@ -31,4 +31,8 @@ class MemoryModel::Base::Fieldable::Field
     @name.to_s
   end
 
+  def inspect
+    ":#{@name}"
+  end
+
 end

@@ -21,14 +21,14 @@ module MemoryModel::Base::Attributable
 
   def inspect
     inspection = if @attributes
-                   self.class.fields.reduce([]) { |array, name|
+                   fields.reduce([]) { |array, name|
                      array << "#{name}: #{attribute_for_inspect(name)}" if has_attribute?(name)
                      array
                    }.join(", ")
                  else
                    "not initialized"
                  end
-    "#<#{self.class} #{inspection}>"
+    "#<#{[self.class, inspection].join(' ')}>"
   end
 
   def read_attribute(name)

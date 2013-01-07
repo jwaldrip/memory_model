@@ -7,7 +7,7 @@ describe MemoryModel::Base::Fieldable::FieldSet do
 
   describe '.new' do
     it "should have an empty array of fields" do
-      field_set.should be_a Array
+      field_set.instance_variable_get(:@fields).should be_a Array
       field_set.size.should == 0
     end
   end
@@ -22,18 +22,18 @@ describe MemoryModel::Base::Fieldable::FieldSet do
 
   describe '#<<' do
     it 'should add a field with the symbol' do
-      expect { field_set << :foo }.to change { field_set }
+      expect { field_set << :foo }.to change { field_set.fields }
     end
   end
 
   describe '#add' do
     it "should add a field" do
-      expect { field_set.add(:foo) }.to change { field_set }
+      expect { field_set.add(:foo) }.to change { field_set.fields }
     end
 
     it "should add a field with options" do
       options = { foo: :bar }
-      expect { field_set.add(:foo, options) }.to change { field_set }
+      expect { field_set.add(:foo, options) }.to change { field_set.fields }
       field_set[:foo].options[:foo].should == :bar
     end
   end

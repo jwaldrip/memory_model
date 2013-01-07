@@ -1,26 +1,33 @@
 require 'active_support/core_ext/hash/keys'
 require 'set'
 
-class MemoryModel::Base::Fieldable::FieldSet < Array
+class MemoryModel::Base::Fieldable::FieldSet
 
   Field = MemoryModel::Base::Fieldable::Field
 
+  attr_reader :fields
+  delegate :include?, to: :fields
+
+  def initialize
+    @fields = []
+  end
+
   def [](name)
-    find { |f| f.name == name.to_sym }
+    @fields.find { |f| f.name == name.to_sym }
   end
 
   def <<(attr)
     attr = Field.new(attr) unless attr.is_a? Field
-    super(attr)
+    @fields << attr
   end
 
   def add(attr, options={ })
-    delete_if { |f| f == attr }
-    self << Field.new(attr, options)
+    @fields.delete_if { |f| f == attr }
+    @fields << Field.new(attr, options)
   end
 
   def comparable
-    select(&:comparable?).map(&:to_sym)
+    @fields.select(&:comparable?).map(&:to_sym)
   end
 
   def inspect
@@ -28,7 +35,7 @@ class MemoryModel::Base::Fieldable::FieldSet < Array
   end
 
   def default_values(model, attributes={ })
-    reduce(attributes.symbolize_keys) do |attrs, field|
+    @fields.reduce(attributes.symbolize_keys) do |attrs, field|
       raise MemoryModel::ReadonlyFieldError if attrs[field.name].present? && field.readonly?
       default           = field.default.is_a?(Symbol) ? field.default.to_proc : field.default
       attrs[field.name] ||= if default.nil?
@@ -51,8 +58,17 @@ class MemoryModel::Base::Fieldable::FieldSet < Array
   end
 
   def to_a
-    map(&:name)
+    @fields.map(&:to_sym)
   end
-  alias :names :to_a
+
+  private
+
+  def method_missing(m, *args, &block)
+    if to_a.respond_to? m
+      to_a.send m, *args, &block
+    else
+      super
+    end
+  end
 
 end

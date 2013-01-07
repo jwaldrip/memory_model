@@ -61,6 +61,13 @@ describe MemoryModel::Base::Attributable do
       instance.inspect.should match /#<#{instance.class}/
     end
 
+    it 'should contain the attributes' do
+      instance.attributes.each do |name, value|
+        value = instance.send :attribute_for_inspect, name
+        instance.inspect.should include "#{name}: #{value}" if instance.has_attribute? name
+      end
+    end
+
     it 'should read not initialized' do
       model.allocate.inspect.should match /not initialized/
     end
