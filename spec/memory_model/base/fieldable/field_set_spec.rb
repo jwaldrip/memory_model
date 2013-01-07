@@ -144,4 +144,17 @@ describe MemoryModel::Base::Fieldable::FieldSet do
     end
   end
 
+  describe '#method_missing' do
+    it 'should delegate off to #to_a' do
+      mock_array = mock
+      mock_array.should_receive :fubar
+      field_set.stub(:to_a).and_return(mock_array)
+      field_set.fubar
+    end
+
+    it 'should raise an error' do
+      expect { field_set.fubar }.to raise_error NoMethodError
+    end
+  end
+
 end

@@ -19,7 +19,13 @@ class MemoryModel::Base
 
   # Active Model Additions
   extend ActiveModel::Callbacks
+  extend ActiveModel::Naming
+  extend ActiveModel::Translation
   include ActiveModel::Conversion
+  include ActiveModel::MassAssignmentSecurity
+  include ActiveModel::Observing
+  include ActiveModel::Serialization
+  include ActiveModel::Validations
 
   # Memory Model Additions
   include Fieldable

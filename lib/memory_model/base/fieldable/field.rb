@@ -1,6 +1,7 @@
 class MemoryModel::Base::Fieldable::Field
 
   attr_reader :name, :options
+  delegate :inspect, to: :to_sym
 
   def initialize(name, options={ })
     @name    = name.to_sym
@@ -29,10 +30,6 @@ class MemoryModel::Base::Fieldable::Field
 
   def to_s
     @name.to_s
-  end
-
-  def inspect
-    ":#{@name}"
   end
 
 end
