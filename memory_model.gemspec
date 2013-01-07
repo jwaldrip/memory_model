@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = MemoryModel::VERSION
   gem.authors       = ["Jason Waldrip"]
   gem.email         = ["jason@waldrip.net"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{An in memory, ORM, Built on top of ActiveModel. Allows for in memory models, great for rspec testing.}
+  gem.summary       = %q{An in memory, ORM}
+  gem.homepage      = "http://github.com/jwaldrip/memory_model"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
