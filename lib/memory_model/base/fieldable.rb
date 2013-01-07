@@ -6,6 +6,8 @@ module MemoryModel::Base::Fieldable
   extend ConcernedInheritance
   extend ActiveSupport::Concern
   extend ActiveSupport::Autoload
+  include ActiveModel::AttributeMethods
+
   autoload :FieldSet
   autoload :Field
 
@@ -15,7 +17,6 @@ module MemoryModel::Base::Fieldable
   end
 
   module ClassMethods
-
     def field(attr, options={ })
       define_attribute_method attr unless instance_method_already_implemented? attr
       fields.add(attr.to_sym, options)
