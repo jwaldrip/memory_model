@@ -2,47 +2,51 @@ require 'spec_helper'
 
 describe MemoryModel::Base do
 
-  let(:klass) { MemoryModel::Base }
+  subject(:base) { MemoryModel::Base }
+
+  it_should_behave_like "ActiveModel" do
+    let(:model) do
+      model = stub_const 'MyModel', Class.new(subject)
+      model.new
+    end
+  end
 
   describe '.new' do
     it 'should raise an error' do
-      expect { klass.new }.to raise_error MemoryModel::InvalidCollectionError
+      expect { base.new }.to raise_error MemoryModel::InvalidCollectionError
     end
   end
 
   describe '.inherited' do
-    subject(:inherited) { Class.new MemoryModel::Base }
+    subject(:model) { Class.new base }
 
     it "should add a new collection to the subclass" do
-      inherited.send(:collection).should be_a MemoryModel::Collection
+      model.send(:collection).should be_a MemoryModel::Collection
     end
 
     it 'should have a field set' do
-      inherited.fields.should be_a MemoryModel::Base::Fieldable::FieldSet
+      model.fields.should be_a MemoryModel::Base::Fieldable::FieldSet
     end
 
     it 'should have an id field' do
-      inherited.fields.should include :id
+      model.fields.should include :id
     end
   end
 
   context "when inherited" do
-    let(:klass) do
-      Class.new MemoryModel::Base do
+    let(:model) do
+      Class.new(base) do
         field :foo
       end
     end
     let(:value) { 'bar' }
-    subject(:instance) { klass.new(foo: value) }
+    subject(:instance) { model.new(foo: value) }
 
     describe '.new' do
       it 'should have an id' do
-        klass.new.id.should be_present
+        model.new.id.should be_present
       end
     end
-
-    # Instance Methods
-
   end
 
 end

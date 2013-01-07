@@ -2,6 +2,7 @@ require 'simplecov'
 SimpleCov.start
 
 require 'memory_model'
+Dir["./spec/support/**/*.rb"].sort.each {|f| require f}
 
 RSpec.configure do |config|
   config.filter_run focus: true

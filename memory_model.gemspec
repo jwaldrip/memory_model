@@ -25,5 +25,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'simplecov'
   gem.add_development_dependency 'terminal-notifier-guard'
   gem.add_development_dependency 'ice_nine'
+  gem.add_development_dependency 'test-unit'
 
 end
