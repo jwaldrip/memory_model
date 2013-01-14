@@ -17,14 +17,15 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = %w{lib}
 
-  gem.add_development_dependency 'activesupport'
-  gem.add_development_dependency 'activemodel'
+  gem.add_dependency 'activemodel'
+  gem.add_dependency 'activesupport'
+  gem.add_dependency 'ice_nine'
+
   gem.add_development_dependency 'guard-rspec'
   gem.add_development_dependency 'rb-fsevent'
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'simplecov'
   gem.add_development_dependency 'terminal-notifier-guard'
-  gem.add_development_dependency 'ice_nine'
   gem.add_development_dependency 'test-unit'
 
 end
