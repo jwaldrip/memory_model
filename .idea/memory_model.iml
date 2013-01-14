@@ -15,6 +15,33 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="activemodel (v@6581d7, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="activesupport (v@6581d7, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="builder (v3.0.4, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bundler (v1.2.3, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="coderay (v1.0.8, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="concerned_inheritance (v0.0.2, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.1.3, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="guard (v1.6.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="guard-rspec (v2.3.3, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="i18n (v0.6.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ice_nine (v0.6.0, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="listen (v0.7.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="lumberjack (v1.0.2, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="method_source (v0.8.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="multi_json (v1.5.0, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="pry (v0.9.10, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rb-fsevent (v0.9.3, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec (v2.12.0, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec-core (v2.12.2, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec-expectations (v2.12.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec-mocks (v2.12.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="simplecov (v0.7.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="simplecov-html (v0.7.1, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="slop (v3.3.3, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="terminal-notifier-guard (v1.5.3, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="test-unit (v2.5.3, rbenv: 1.9.3-p362) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="thor (v0.16.0, rbenv: 1.9.3-p362) [gem]" level="application" />
   </component>
 </module>
 
