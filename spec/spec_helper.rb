@@ -1,8 +1,12 @@
 require 'simplecov'
-SimpleCov.start
+require 'rspec/autorun'
+require 'coveralls'
 
-require 'bundler'
-Bundler.setup
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
+SimpleCov.start
 
 require 'memory_model'
 Dir["./spec/support/**/*.rb"].sort.each {|f| require f}
