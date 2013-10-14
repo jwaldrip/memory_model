@@ -23,7 +23,7 @@ class MemoryModel::Base
   extend ActiveModel::Naming
   extend ActiveModel::Translation
   include ActiveModel::Conversion
-  include ActiveModel::MassAssignmentSecurity
+  include ActiveModel::MassAssignmentSecurity if ActiveModel::VERSION::MAJOR < 4 || (ActiveModel::VERSION::MAJOR == 3 && ActiveModel::VERSION::MINOR > 2)
   include ActiveModel::Observing
   include ActiveModel::Serialization
   include ActiveModel::Validations
