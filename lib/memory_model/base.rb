@@ -17,16 +17,21 @@ class MemoryModel::Base
   autoload :Versioning
   autoload :Persistence
   autoload :Operations
+  autoload :Conversion
 
   # Active Model Additions
   extend ActiveModel::Callbacks
   extend ActiveModel::Naming
   extend ActiveModel::Translation
   include ActiveModel::Conversion
-  include ActiveModel::MassAssignmentSecurity if ActiveModel::VERSION::MAJOR < 4 || (ActiveModel::VERSION::MAJOR == 3 && ActiveModel::VERSION::MINOR > 2)
-  include ActiveModel::Observing
   include ActiveModel::Serialization
   include ActiveModel::Validations
+
+  # 3.2 Only Active Model Additions
+  if ActiveModel::VERSION::MAJOR < 4 || (ActiveModel::VERSION::MAJOR == 3 && ActiveModel::VERSION::MINOR > 2)
+    include ActiveModel::MassAssignmentSecurity
+    include ActiveModel::Observing
+  end
 
   # Memory Model Additions
   include Fields
@@ -36,6 +41,7 @@ class MemoryModel::Base
   include Attributes
   include Versioning
   include Persistence
+  include Conversion
 
   # Active Model Callbacks
   define_model_callbacks :initialize, only: [:after]

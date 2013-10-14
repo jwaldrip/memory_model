@@ -1,6 +1,7 @@
 require 'simplecov'
 require 'rspec/autorun'
 require 'coveralls'
+require 'bundler/setup'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,

@@ -26,7 +26,7 @@ describe MemoryModel::Base::Actions do
 
   describe '.delete_all' do
     it 'should call delete on each item' do
-      collection_mock = 10.times.map { mock }
+      collection_mock = 10.times.map { double }
       model.stub(:all).and_return(collection_mock)
       model.all.each do |instance|
         instance.should_receive(:delete).and_return(instance)
@@ -43,7 +43,7 @@ describe MemoryModel::Base::Actions do
 
   describe '.destroy_all' do
     it 'should call delete on each item' do
-      collection_mock = 10.times.map { mock }
+      collection_mock = 10.times.map { double }
       model.stub(:all).and_return(collection_mock)
       model.all.each do |instance|
         instance.should_receive(:destroy).and_return(instance)

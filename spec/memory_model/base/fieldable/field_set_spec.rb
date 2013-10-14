@@ -50,7 +50,7 @@ describe MemoryModel::Base::Fields::FieldSet do
 
   describe '#inspect' do
     it 'should delegate inspect to #to_a' do
-      names_mock = mock
+      names_mock = double
       names_mock.should_receive(:inspect)
       field_set.stub(:to_a).and_return(names_mock)
       field_set.inspect
@@ -58,7 +58,7 @@ describe MemoryModel::Base::Fields::FieldSet do
   end
 
   describe '#default_values' do
-    let(:mock_model) { mock }
+    let(:mock_model) { double }
 
     context 'with a symbol' do
       it 'should call the method on the model' do
@@ -146,7 +146,7 @@ describe MemoryModel::Base::Fields::FieldSet do
 
   describe '#method_missing' do
     it 'should delegate off to #to_a' do
-      mock_array = mock
+      mock_array = double
       mock_array.should_receive :fubar
       field_set.stub(:to_a).and_return(mock_array)
       field_set.fubar

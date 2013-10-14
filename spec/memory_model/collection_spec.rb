@@ -133,7 +133,7 @@ describe MemoryModel::Collection do
 
   describe '#inspect' do
     it 'should delegate inspect to all' do
-      all_mock = mock
+      all_mock = double
       all_mock.should_receive(:inspect)
       collection.stub(:all).and_return(all_mock)
       collection.inspect
@@ -142,7 +142,7 @@ describe MemoryModel::Collection do
 
   describe '#records' do
     let(:mock_record) do
-      mock_record = mock
+      mock_record = double
       mock_record.stub(:deleted?).and_return(false)
       mock_record
     end
@@ -174,7 +174,7 @@ describe MemoryModel::Collection do
 
   describe '#method_missing' do
     it 'should delegate method to all' do
-      all_mock = mock
+      all_mock = double
       all_mock.should_receive(:test_method)
       collection.stub(:all).and_return(all_mock)
       collection.test_method
@@ -183,7 +183,7 @@ describe MemoryModel::Collection do
 
   describe '#respond_to_missing?' do
     it 'should check if all responds to' do
-      all_mock = mock
+      all_mock = double
       all_mock.should_receive(:respond_to?)
       collection.stub(:all).and_return(all_mock)
       collection.send :respond_to_missing?, :test_method
