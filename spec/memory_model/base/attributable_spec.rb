@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MemoryModel::Base::Attributable do
+describe MemoryModel::Base::Attributes do
 
   let(:model) do
     Class.new(MemoryModel::Base) do

@@ -1,4 +1,4 @@
-module MemoryModel::Base::Versionable
+module MemoryModel::Base::Versioning
 
   def versions
     instances = self.class.collection.records.select { |i| i.id == self.id }

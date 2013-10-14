@@ -1,6 +1,6 @@
 require 'active_support/concern'
 
-module MemoryModel::Base::Collectable
+module MemoryModel::Base::Collection
   extend ActiveSupport::Concern
   extend ConcernedInheritance
 

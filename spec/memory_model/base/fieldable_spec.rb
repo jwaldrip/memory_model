@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MemoryModel::Base::Fieldable do
+describe MemoryModel::Base::Fields do
 
   let(:model_a) { Class.new(MemoryModel::Base) }
   let(:model_b) { Class.new(MemoryModel::Base) }

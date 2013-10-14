@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MemoryModel::Base::Actionable do
+describe MemoryModel::Base::Actions do
   let(:model) do
     Class.new(MemoryModel::Base) do
       field :foo

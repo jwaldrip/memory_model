@@ -25,7 +25,7 @@ describe MemoryModel::Base do
     end
 
     it 'should have a field set' do
-      model.fields.should be_a MemoryModel::Base::Fieldable::FieldSet
+      model.fields.should be_a MemoryModel::Base::Fields::FieldSet
     end
 
     it 'should have an id field' do

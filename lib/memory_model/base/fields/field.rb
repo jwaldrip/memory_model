@@ -1,4 +1,4 @@
-class MemoryModel::Base::Fieldable::Field
+class MemoryModel::Base::Fields::Field
 
   attr_reader :name, :options
   delegate :inspect, to: :to_sym

@@ -1,4 +1,4 @@
-module MemoryModel::Base::Attributable
+module MemoryModel::Base::Attributes
   extend ActiveSupport::Concern
   include ActiveModel::AttributeMethods
   include ActiveModel::Dirty

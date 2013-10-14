@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MemoryModel::Base::Versionable do
+describe MemoryModel::Base::Versioning do
 
   let(:model) do
     Class.new(MemoryModel::Base)

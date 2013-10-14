@@ -1,6 +1,9 @@
 require 'simplecov'
 SimpleCov.start
 
+require 'bundler'
+Bundler.setup
+
 require 'memory_model'
 Dir["./spec/support/**/*.rb"].sort.each {|f| require f}
 

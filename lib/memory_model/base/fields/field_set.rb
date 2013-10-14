@@ -1,9 +1,9 @@
 require 'active_support/core_ext/hash/keys'
 require 'set'
 
-class MemoryModel::Base::Fieldable::FieldSet
+class MemoryModel::Base::Fields::FieldSet
 
-  Field = MemoryModel::Base::Fieldable::Field
+  Field = parent::Field
 
   attr_reader :fields
   delegate :include?, to: :fields

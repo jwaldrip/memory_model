@@ -1,4 +1,4 @@
-require "concerned_inheritance"
+require 'concerned_inheritance'
 require 'active_support/core_ext/object'
 require 'active_support/core_ext/hash'
 require 'active_support/dependencies/autoload'
@@ -9,31 +9,32 @@ class MemoryModel::Base
   extend ActiveSupport::Autoload
   extend ConcernedInheritance
 
-  autoload :Fieldable
-  autoload :Collectable
-  autoload :Comparable
-  autoload :Actionable
-  autoload :Attributable
-  autoload :Versionable
+  autoload :Fields
+  autoload :Collection
+  autoload :Comparison
+  autoload :Actions
+  autoload :Attributes
+  autoload :Versioning
   autoload :Persistence
+  autoload :Operations
 
   # Active Model Additions
   extend ActiveModel::Callbacks
   extend ActiveModel::Naming
   extend ActiveModel::Translation
   include ActiveModel::Conversion
-  include ActiveModel::MassAssignmentSecurity
+  include ActiveModel::MassAssignmentSecurity if ActiveModel::VERSION::MAJOR < 4 || (ActiveModel::VERSION::MAJOR == 3 && ActiveModel::VERSION::MINOR > 2)
   include ActiveModel::Observing
   include ActiveModel::Serialization
   include ActiveModel::Validations
 
   # Memory Model Additions
-  include Fieldable
-  include Collectable
-  include Comparable
-  include Actionable
-  include Attributable
-  include Versionable
+  include Fields
+  include Collection
+  include Operations::Comparisons
+  include Actions
+  include Attributes
+  include Versioning
   include Persistence
 
   # Active Model Callbacks

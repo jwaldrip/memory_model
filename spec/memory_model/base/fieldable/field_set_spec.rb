@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe MemoryModel::Base::Fieldable::FieldSet do
+describe MemoryModel::Base::Fields::FieldSet do
 
-  let(:klass) { MemoryModel::Base::Fieldable::FieldSet }
+  let(:klass) { MemoryModel::Base::Fields::FieldSet }
   subject(:field_set) { klass.new }
 
   describe '.new' do

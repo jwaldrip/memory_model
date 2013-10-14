@@ -1,4 +1,4 @@
-module MemoryModel::Base::Comparable
+module MemoryModel::Base::Operations::Comparisons
 
   def ==(other_object)
     attributes.slice(*fields.comparable) ==

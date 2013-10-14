@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MemoryModel::Base::Comparable do
+describe MemoryModel::Base::Operations::Comparisons do
   let(:model) do
     Class.new(MemoryModel::Base) do
       field :foo

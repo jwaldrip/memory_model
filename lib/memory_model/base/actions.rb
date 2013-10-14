@@ -1,7 +1,7 @@
 require 'ice_nine'
 require 'ice_nine/core_ext/object'
 
-module MemoryModel::Base::Actionable
+module MemoryModel::Base::Actions
   extend ActiveSupport::Concern
 
   included do

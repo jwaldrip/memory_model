@@ -2,7 +2,7 @@ require 'active_support/concern'
 require 'active_support/dependencies/autoload'
 require 'securerandom'
 
-module MemoryModel::Base::Fieldable
+module MemoryModel::Base::Fields
   extend ConcernedInheritance
   extend ActiveSupport::Concern
   extend ActiveSupport::Autoload
