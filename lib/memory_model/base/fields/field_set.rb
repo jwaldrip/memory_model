@@ -1,4 +1,5 @@
 require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/string'
 require 'set'
 
 class MemoryModel::Base::Fields::FieldSet
@@ -21,7 +22,7 @@ class MemoryModel::Base::Fields::FieldSet
     @fields << attr
   end
 
-  def add(attr, options={ })
+  def add(attr, options={})
     @fields.delete_if { |f| f == attr }
     @fields << Field.new(attr, options)
   end
@@ -34,27 +35,40 @@ class MemoryModel::Base::Fields::FieldSet
     to_a.inspect
   end
 
-  def default_values(model, attributes={ })
+  def default_values(model, attributes={})
     @fields.reduce(attributes.symbolize_keys) do |attrs, field|
       raise MemoryModel::ReadonlyFieldError if attrs[field.name].present? && field.readonly?
-      default           = field.default.is_a?(Symbol) ? field.default.to_proc : field.default
-      attrs[field.name] ||= if default.nil?
-                              nil
-                            elsif default.is_a? String
-                              default
-                            elsif default.not_a?(::Proc)
-                              raise ArgumentError, "#{default} must be a string, symbol, lamba or proc"
-                            elsif default.lambda? && default.arity == 0
-                              default.call
-                            elsif default.arity.in? -1..0
-                              model.instance_eval(&default)
-                            elsif default.arity == 1
-                              default.yield model
-                            else
-                              raise ArgumentError, "#{default} must have an arity of 0..1, got #{default.arity}"
-                            end
-      attrs
+      default = field.default
+      attrs.reverse_merge field.name => begin
+        send("default_values_for_#{default.class.name.underscore}", model, default)
+      rescue NoMethodError => e
+        raise ArgumentError, "#{default} must be a string, symbol, lambda or proc"
+      end
     end
+  end
+
+  def default_values_for_proc(model, proc)
+    if proc.lambda? && proc.arity == 0
+      proc.call
+    elsif proc.arity < 1
+      model.instance_eval(&proc)
+    elsif proc.arity == 1
+      proc.yield model
+    else
+      raise ArgumentError, "#{proc} must have an arity of 0..1, got #{proc.arity}"
+    end
+  end
+
+  def default_values_for_string(model, string)
+    string
+  end
+
+  def default_values_for_symbol(model, symbol)
+    model.instance_eval(&symbol)
+  end
+
+  def default_values_for_nil_class(model, symbol)
+    nil
   end
 
   def to_a
