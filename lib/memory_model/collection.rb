@@ -7,10 +7,31 @@ class MemoryModel::Collection
   extend ActiveSupport::Autoload
 
   autoload :Index
-  autoload :UniqueIndex
+  autoload :UniqueIndexMethods
+  autoload :MultiIndexMethods
+  autoload :IndexDefinitions
   autoload :MarshaledRecord
+  autoload :AllowNilMethods
 
   class RecordNotUnique < StandardError
+    def initialize(options)
+      options.assert_valid_keys :index, :value
+      @index_name = options[:index]
+      @value      = options[:value]
+    end
+
+    def message
+      "The index `#{@index_name}` is unique and already contains a record with the value of #{@value.inspect}"
+    end
+
+  end
+
+  class MissingPrimaryKey < StandardError
+
+    def message
+      "Unable to complete a find without a primary key, use `find_by` or set a `primary_key`"
+    end
+
   end
 
   class << self
@@ -21,18 +42,39 @@ class MemoryModel::Collection
 
   cache_method :all, keys: :index_digest
 
-  attr_reader :indexes
+  attr_reader :indexes, :records, :primary_key
   delegate *(Array.public_instance_methods - Object.instance_methods), :inspect, to: :all
 
   def initialize(model = Class.new)
     @model   = model
     @indexes = Hash.new
-    add_index :id, unique: true
+    @records = Hash.new
+    add_index :sha, unique: true
     self.class.all << self
   end
 
   def add_index(key, options = {})
-    indexes[key.to_sym] ||= options.delete(:unique) ? UniqueIndex.new(key) : Index.new(key)
+    indexes[key.to_sym] ||= extend_index_from_options Index.new(key), options
+  end
+
+  def extend_index_from_options(index, options={})
+    index.tap do
+      index.extend options.delete(:unique) ? UniqueIndexMethods : MultiIndexMethods
+      options.each do |key, bool|
+        const = case key
+                when String, Symbol
+                  self.class.const_get key.to_s.camelize + 'Methods'
+                when Module
+                  key
+                end
+        index.extend const if bool
+      end
+    end
+  end
+
+  def set_primary_key(key)
+    add_index key, unique: true
+    @primary_key = key
   end
 
   def clear
@@ -52,7 +94,8 @@ class MemoryModel::Collection
   end
 
   def find(id)
-    indexes[:id][id].load
+    raise MissingPrimaryKey unless primary_key.present?
+    indexes[primary_key][id].load
   rescue NoMethodError
     raise(MemoryModel::RecordNotFoundError)
   end
@@ -74,8 +117,8 @@ class MemoryModel::Collection
 
   def insert(record)
     raise TypeError unless record.is_a? @model
-    indexable_attributes = record.attributes.symbolize_keys.select do |attr, value|
-      value.present? && indexes.has_key?(attr)
+    indexable_attributes = index_names.reduce({}) do |hash, attr|
+      hash.merge attr => record.public_send(attr)
     end
 
     assign_to_indexes indexable_attributes, record
@@ -89,10 +132,6 @@ class MemoryModel::Collection
     indexes.each do |key, records|
       records.delete_if { |key, record| record.id == instance.id }
     end
-  end
-
-  def records
-    indexes[:id].values
   end
 
   def where(hash)
@@ -120,10 +159,10 @@ class MemoryModel::Collection
   end
 
   def assign_to_indexes(hash, record)
-    marshaled_record     = MarshaledRecord.new record
+    marshaled_record = MarshaledRecord.new record
     validate_for_indexing! hash, marshaled_record
     hash.each do |attr, value|
-      indexes[attr].remove(record.public_send("#{attr}_was"), marshaled_record)
+      indexes[attr].remove(record.changed_attributes[attr.to_s], marshaled_record)
       indexes[attr].insert(value, marshaled_record)
     end
   end
@@ -139,8 +178,7 @@ class MemoryModel::Collection
   def validate_for_indexing!(hash, marshaled_record)
     hash.each do |attr, value|
       unless indexes[attr].valid_object?(value, marshaled_record)
-        raise RecordNotUnique,
-              "The index `#{attr}` is unique and already contains a record with the value of #{value.inspect}"
+        raise RecordNotUnique, index: attr, value: value
       end
     end
   end

@@ -1,9 +1,9 @@
 class MemoryModel::Collection::MarshaledRecord
 
-  attr_reader :id
+  attr_reader :sha
 
   def initialize(record)
-    @id = record.id
+    @sha = record.sha
     @string = Marshal.dump record
     freeze
   end
@@ -13,7 +13,7 @@ class MemoryModel::Collection::MarshaledRecord
   end
 
   def ==(other_object)
-    id == other_object.try(:id)
+    sha == other_object.try(:sha)
   end
 
 end

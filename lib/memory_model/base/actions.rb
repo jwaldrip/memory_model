@@ -6,19 +6,19 @@ module MemoryModel::Base::Actions
 
   included do
     define_model_callbacks :create, :update, :save, :destroy
-    attr_reader :timestamp
+    attr_reader :timestamp, :sha
+    before_save(:remove_invalid_instance_vars)
   end
 
   VALID_IVARS = [
-    :@deleted,
     :@attributes,
     :@timestamp,
-    :@version
+    :@sha
   ]
 
   def commit
     @timestamp = Time.now
-    @version   = SecureRandom.hex(6)
+    @sha = Digest::SHA256.hexdigest [@timestamp, object_id].join
     self.class.insert self
     self
   end
@@ -42,25 +42,20 @@ module MemoryModel::Base::Actions
     end
   end
 
-  def deep_dup
-    Marshal.load Marshal.dump self
-  end
-
-  def freeze
-    instance_variables.reject { |ivar| ivar.in? VALID_IVARS }.each do |ivar|
-      remove_instance_variable ivar if instance_variable_defined?(ivar)
-    end
-    instance_variables.each { |ivar| instance_variable_get(ivar).freeze }
-    deep_freeze
-    super
-  end
-
   def save
     callback = persisted? ? :update : :create
     run_callbacks callback do
       run_callbacks :save do
         commit
       end
+    end
+  end
+
+  private
+
+  def remove_invalid_instance_vars
+    instance_variables.reject { |ivar| ivar.in? VALID_IVARS }.each do |ivar|
+      remove_instance_variable ivar if instance_variable_defined?(ivar)
     end
   end
 
