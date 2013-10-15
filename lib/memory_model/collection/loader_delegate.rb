@@ -16,7 +16,8 @@ class MemoryModel::Collection::LoaderDelegate < BasicObject
     end
   end
 
-  delegate_and_load :first, :last, :count, :size, :length
+  delegate_and_load :first, :last
+  delegate :count, :size, :length, to: :@records
 
   def initialize(records)
     @records = records

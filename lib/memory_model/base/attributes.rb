@@ -38,7 +38,7 @@ module MemoryModel::Base::Attributes
                  else
                    "not initialized"
                  end
-    super.sub /^(#<[a-z:0-9]+).*>/i, "\\1 #{inspection}>"
+    super.sub /^(#<[a-z:0-9]+) .*>/i, "\\1#{inspection}>"
   end
 
   def read_attribute(name)

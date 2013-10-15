@@ -11,6 +11,9 @@ module MemoryModel
 
   module Base::Actions
     extend ActiveSupport::Concern
+    extend ActiveSupport::Autoload
+
+    autoload :ClassMethods
 
     included do
       define_model_callbacks :create, :update, :save, :destroy, :validation
@@ -79,26 +82,5 @@ module MemoryModel
       end
     end
 
-    module ClassMethods
-
-      def create(attributes={})
-        new(attributes).tap(&:save)
-      end
-
-      def create!(attributes={})
-        new(attributes).tap(&:save!)
-      end
-
-      def delete_all
-        count.tap do
-          self.collection.clear
-        end
-      end
-
-      def destroy_all
-        self.all.each(&:destroy)
-      end
-
-    end
   end
 end

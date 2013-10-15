@@ -118,16 +118,16 @@ class MemoryModel::Collection
 
   def remove(instance)
     indexes.each do |key, records|
-      records.delete_if { |key, record| record.id == instance.id }
+      records.delete_if { |key, record| record.sid == instance.__sid__ }
     end
   end
 
   def where(hash)
     matched_ids = hash.symbolize_keys.reduce(__sids__) do |array, (attr, value)|
       records = indexes.has_key?(attr) ? where_in_index(attr, value) : where_in_all(attr, value)
-      array & records.map(&:__sid__)
+      array & records.map(&:sid)
     end
-    find_all(*matched_ids)
+    load_all(*matched_ids)
   end
 
   def find_by(hash)
@@ -147,6 +147,11 @@ class MemoryModel::Collection
   end
 
   private
+
+  def load_all(*ids)
+    return [] if ids.blank?
+    indexes[:__sid__].values_at(*ids).map(&:load)
+  end
 
   def records
     indexes[:__sid__].values
