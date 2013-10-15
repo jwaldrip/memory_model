@@ -140,7 +140,7 @@ class MemoryModel::Collection
     hash.each do |attr, value|
       unless indexes[attr].valid_object?(value, marshaled_record)
         raise RecordNotUnique,
-              "The index `#{name}` is unique and already contains a record with the value of #{value.inspect}"
+              "The index `#{attr}` is unique and already contains a record with the value of #{value.inspect}"
       end
     end
   end
