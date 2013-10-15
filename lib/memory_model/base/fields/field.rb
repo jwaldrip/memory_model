@@ -8,6 +8,12 @@ class MemoryModel::Base::Fields::Field
     @options = options.reverse_merge!({ readonly: false, comparable: true })
   end
 
+  def increment!
+    raise ArguementError, "#{name} is not incrementable" unless options[:auto_increment] === true
+    @incrementor ||= 0
+    @incrementor += 1
+  end
+
   def ==(other_object)
     self.to_sym == other_object.to_sym
   end

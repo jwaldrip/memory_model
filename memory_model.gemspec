@@ -20,8 +20,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activemodel', '>= 3.2'
   gem.add_dependency 'activesupport', '>= 3.2'
   gem.add_dependency 'concerned_inheritance'
-  gem.add_dependency 'ice_nine', '~> 0.6.0'
-  gem.add_dependency 'def_cache', '~> 0.1.1'
 
   gem.add_development_dependency 'appraisal'
   gem.add_development_dependency 'guard-rspec'

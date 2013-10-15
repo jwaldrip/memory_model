@@ -17,6 +17,7 @@ class MemoryModel::Base
   autoload :Persistence
   autoload :Operations
   autoload :Conversion
+  autoload :AutoIncrement
 
   # Active Model Additions
   extend ActiveModel::Callbacks
@@ -40,6 +41,7 @@ class MemoryModel::Base
   include Attributes
   include Persistence
   include Conversion
+  include AutoIncrement
 
   # Active Model Callbacks
   define_model_callbacks :initialize, only: [:after]
@@ -48,7 +50,7 @@ class MemoryModel::Base
     unless self.class.collection.is_a? MemoryModel::Collection
       raise MemoryModel::InvalidCollectionError, "#{self.class} does not have an assigned collection"
     end
-    @attributes = fields.default_values(self, attributes).with_indifferent_access
+    fields.set_default_values(self, attributes).with_indifferent_access
     @deleted    = false
     run_callbacks :initialize
   end

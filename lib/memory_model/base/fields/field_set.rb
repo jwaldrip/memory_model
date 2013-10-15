@@ -7,7 +7,7 @@ class MemoryModel::Base::Fields::FieldSet
   Field = parent::Field
 
   attr_reader :fields
-  delegate :include?, to: :fields
+  delegate *(Array.public_instance_methods - Object.instance_methods), :inspect, to: :fields
 
   def initialize
     @fields = []
@@ -31,13 +31,8 @@ class MemoryModel::Base::Fields::FieldSet
     @fields.select(&:comparable?).map(&:to_sym)
   end
 
-  def inspect
-    to_a.inspect
-  end
-
-  def default_values(model, attributes={})
-    @fields.reduce(attributes.symbolize_keys) do |attrs, field|
-      raise MemoryModel::ReadonlyFieldError if attrs[field.name].present? && field.readonly?
+  def set_default_values(model, attributes={})
+    attrs = @fields.reduce(attributes.symbolize_keys) do |attrs, field|
       default = field.default
       attrs.reverse_merge field.name => begin
         send("default_values_for_#{default.class.name.underscore}", model, default)
@@ -45,6 +40,7 @@ class MemoryModel::Base::Fields::FieldSet
         raise ArgumentError, "#{default} must be a string, symbol, lambda or proc"
       end
     end
+    model.attributes = attrs
   end
 
   def default_values_for_proc(model, proc)
@@ -69,10 +65,6 @@ class MemoryModel::Base::Fields::FieldSet
 
   def default_values_for_nil_class(model, symbol)
     nil
-  end
-
-  def to_a
-    @fields.map(&:to_sym)
   end
 
   private

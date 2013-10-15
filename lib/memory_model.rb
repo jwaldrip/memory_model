@@ -7,9 +7,10 @@ module MemoryModel
   autoload :Collection
   autoload :Base
 
-  class InvalidCollectionError < StandardError ; end
-  class InvalidFieldError < StandardError ; end
-  class ReadonlyFieldError < StandardError ; end
-  class RecordNotFoundError < StandardError ; end
+  class Error < StandardError ; end
+  class InvalidCollectionError < Error ; end
+  class InvalidFieldError < Error ; end
+  class ReadonlyFieldError < Error ; end
+  class RecordNotFoundError < Error ; end
 
 end

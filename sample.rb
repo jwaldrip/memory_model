@@ -2,7 +2,7 @@ require 'memory_model'
 require 'pry'
 
 class Foo < MemoryModel::Base
-  field :id, default: ->{ SecureRandom.uuid }
+  field :id, auto_increment: true
   field :first_name
   field :last_name
   field :email
@@ -12,26 +12,23 @@ class Foo < MemoryModel::Base
   add_index :last_name
   add_index :first_name
   add_index :email, unique: true, allow_nil: true
+
+  validates_presence_of :email
 end
 
-start = Time.now
+# ----------------------------------------------------------------------------------------------------------------------
 
-Foo.create first_name: 'Tom', last_name: 'Chapin', email: 'tchapin@gmail.com', age: 30
-Foo.create first_name: 'Tom', last_name: 'Brokaw', email: 'tbmoney@gmail.com', age: 65
-Foo.create first_name: 'Tom', last_name: 'Anderton', email: 'ta@gmail.com', age: 42
-Foo.create first_name: 'Jason', last_name: 'Waldrip', email: 'jaydub@gmail.com', age: 27
-Foo.create first_name: 'Jason', last_name: 'Smith', email: 'jaysmitty@gmail.com', age: nil
-Foo.create first_name: 'Ron', last_name: 'Burgandy', email: 'mustache@gmail.com'
+require 'benchmark'
 
-10000.times { Foo.create name: SecureRandom.uuid }
+n = 10000
 
-puts Time.now - start,
-     "To create #{Foo.count} records"
+def benchmark_average(count, name = nil, &block)
+  milliseconds = (count.times.map { Benchmark.measure &block }.map(&:total).reduce(:+) / count) * 1000
+  [name, "took an average of #{milliseconds} milliseconds"].compact.join(' ')
+end
 
-start = Time.now
-record = Foo.find Foo.ids.sample
-puts Time.now - start,
-     'To lookup the record',
-     record
+puts benchmark_average(10000, 'create') { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
 
 binding.pry
+
+record = Foo.find Foo.ids.sample

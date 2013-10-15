@@ -4,10 +4,19 @@ module MemoryModel::Base::Attributes
   include ActiveModel::Dirty
 
   included do
-    attr_reader :attributes
     delegate :to_hash, to: :attributes
     attribute_method_affix :prefix => 'reset_', :suffix => '_to_default!'
     attribute_method_prefix 'clear_'
+  end
+
+  def attributes
+    @attributes ||= HashWithIndifferentAccess.new
+  end
+
+  def attributes=(hash)
+    hash.reduce({}) do |hash, (attr, value)|
+      hash.merge attr => write_attribute(attr, value)
+    end
   end
 
   def has_attribute?(key)
@@ -20,8 +29,9 @@ module MemoryModel::Base::Attributes
   end
 
   def inspect
-    inspection = if @attributes
-                   fields.reduce([]) { |array, name|
+    inspection = if attributes.present?
+                   fields.reduce([]) { |array, field|
+                     name = field.name
                      array << "#{name}: #{attribute_for_inspect(name)}" if has_attribute?(name)
                      array
                    }.join(", ")
@@ -32,7 +42,7 @@ module MemoryModel::Base::Attributes
   end
 
   def read_attribute(name)
-    @attributes[name]
+    attributes[name]
   end
 
   alias :[] :read_attribute
@@ -40,11 +50,11 @@ module MemoryModel::Base::Attributes
   def write_attribute(name, value)
     raise MemoryModel::InvalidFieldError,
           "#{name} is not a valid field" unless fields.include? name
-    raise MemoryModel::FieldReadOnlyError,
-          "#{name} is read only" if fields[name].options[:readonly]
+    raise MemoryModel::ReadonlyFieldError,
+          "#{name} is read only" if fields[name].options[:readonly] && persisted?
 
     send "#{name}_will_change!" unless value == read_attribute(name) || new_record?
-    @attributes[name] = value
+    attributes[name] = value
   end
 
   alias :[]= :write_attribute

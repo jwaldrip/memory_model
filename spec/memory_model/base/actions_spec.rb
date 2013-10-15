@@ -132,33 +132,6 @@ describe MemoryModel::Base::Actions do
     end
   end
 
-  describe '#deep_dup' do
-    it 'should not be frozen' do
-      dup = instance.freeze.deep_dup
-      instance.should be_frozen
-      dup.should_not be_frozen
-    end
-
-    it 'should return a new object' do
-      dup = instance.deep_dup
-      dup.object_id.should_not == instance.object_id
-    end
-  end
-
-  describe '#freeze' do
-    it 'should remove invalid ivars' do
-      ivar = :@foo
-      instance.instance_variable_set ivar, 'bar'
-      instance.freeze
-      instance.instance_variables.should_not include ivar
-    end
-
-    it 'should be frozen' do
-      instance.freeze
-      instance.should be_frozen
-    end
-  end
-
   describe '#save' do
     it 'should call delete' do
       instance.should_receive(:commit)

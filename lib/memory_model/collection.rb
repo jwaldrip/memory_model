@@ -1,9 +1,7 @@
-require 'def_cache'
 require 'active_support/hash_with_indifferent_access'
 require 'active_support/dependencies/autoload'
 
 class MemoryModel::Collection
-  include DefCache
   extend ActiveSupport::Autoload
 
   autoload :Index
@@ -12,6 +10,7 @@ class MemoryModel::Collection
   autoload :IndexDefinitions
   autoload :MarshaledRecord
   autoload :AllowNilMethods
+  autoload :LoaderDelegate
 
   class RecordNotUnique < StandardError
     def initialize(options)
@@ -40,16 +39,13 @@ class MemoryModel::Collection
 
   self.all = []
 
-  cache_method :all, keys: :index_digest
-
-  attr_reader :indexes, :records, :primary_key
-  delegate *(Array.public_instance_methods - Object.instance_methods), :inspect, to: :all
+  attr_reader :indexes, :primary_key
+  delegate *(Enumerable.public_instance_methods - Object.instance_methods), :inspect, to: :all
 
   def initialize(model = Class.new)
     @model   = model
     @indexes = Hash.new
-    @records = Hash.new
-    add_index :sha, unique: true
+    add_index :__sid__, unique: true
     self.class.all << self
   end
 
@@ -86,11 +82,7 @@ class MemoryModel::Collection
   end
 
   def all
-    records.map { |mo| mo.load }
-  end
-
-  def count
-    all.count
+    LoaderDelegate.new(records)
   end
 
   def find(id)
@@ -142,20 +134,34 @@ class MemoryModel::Collection
     find_all(*matched_ids)
   end
 
+  def find_by(hash)
+    where(hash).first
+  end
+
+  def find_or_initialize_by(hash)
+    find_by(hash) || model.new(hash)
+  end
+
+  def find_or_create_by(hash)
+    find_by(hash) || model.create(hash)
+  end
+
+  def find_or_create_by!(hash)
+    find_by(hash) || model.create!(hash)
+  end
+
   private
 
+  def records
+    indexes[:__sid__].values
+  end
+
   def where_in_index(attr, value)
-    puts "where in index for `#{attr}`, with value: #{value}"
     indexes[attr].where value
   end
 
   def where_in_all(attr, value)
-    puts "where in all for `#{attr}`, with value: #{value}"
     all.select { |record| record.read_attribute(attr) == value }
-  end
-
-  def index_digest(index = :id)
-    Digest::MD5.hexdigest indexes[index].values.join
   end
 
   def assign_to_indexes(hash, record)

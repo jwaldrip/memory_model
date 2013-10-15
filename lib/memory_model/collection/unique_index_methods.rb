@@ -14,7 +14,7 @@ module MemoryModel::Collection::UniqueIndexMethods
   end
 
   where do |index_value|
-    [self[index_value]]
+    [self[index_value]].compact
   end
 
 end

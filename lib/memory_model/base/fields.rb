@@ -13,7 +13,6 @@ module MemoryModel::Base::Fields
 
   inherited do
     instance_variable_set :@fields, baseclass.fields
-    field :id, readonly: true, default: -> { SecureRandom.uuid }, comparable: false
   end
 
   module ClassMethods

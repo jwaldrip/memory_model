@@ -6,11 +6,11 @@ module MemoryModel::Collection::MultiIndexMethods
   end
 
   insert do |index_value, record|
-    inner_index(index_value)[record.sha] = record
+    inner_index(index_value)[record.sid] = record
   end
 
   remove do |index_value, record|
-    inner_index(index_value).delete(record.sha)
+    inner_index(index_value).delete(record.sid)
   end
 
   where do |index_value|
