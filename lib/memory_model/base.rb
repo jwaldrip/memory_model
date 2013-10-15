@@ -10,11 +10,10 @@ class MemoryModel::Base
   extend ConcernedInheritance
 
   autoload :Fields
-  autoload :Collection
+  autoload :Collectible
   autoload :Comparison
   autoload :Actions
   autoload :Attributes
-  autoload :Versioning
   autoload :Persistence
   autoload :Operations
   autoload :Conversion
@@ -35,11 +34,10 @@ class MemoryModel::Base
 
   # Memory Model Additions
   include Fields
-  include Collection
+  include Collectible
   include Operations::Comparisons
   include Actions
   include Attributes
-  include Versioning
   include Persistence
   include Conversion
 

@@ -27,11 +27,8 @@ describe MemoryModel::Base::Actions do
   describe '.delete_all' do
     it 'should call delete on each item' do
       collection_mock = 10.times.map { double }
-      model.stub(:all).and_return(collection_mock)
-      model.all.each do |instance|
-        instance.should_receive(:delete).and_return(instance)
-        instance.should_receive(:deleted?).and_return(true)
-      end
+      collection_mock.should_receive(:clear)
+      allow(model).to receive(:collection).and_return(collection_mock)
       model.delete_all
     end
     it 'should return true' do
@@ -44,10 +41,9 @@ describe MemoryModel::Base::Actions do
   describe '.destroy_all' do
     it 'should call delete on each item' do
       collection_mock = 10.times.map { double }
-      model.stub(:all).and_return(collection_mock)
+      allow(model).to receive(:all).and_return(collection_mock)
       model.all.each do |instance|
         instance.should_receive(:destroy).and_return(instance)
-        instance.should_receive(:deleted?).and_return(true)
       end
       model.destroy_all
     end
@@ -82,22 +78,6 @@ describe MemoryModel::Base::Actions do
   describe '#delete' do
     it 'should be frozen' do
       instance.commit.delete.should be_frozen
-    end
-  end
-
-  describe '#deleted_at' do
-    context 'when deleted' do
-      it 'should have a timestamp' do
-        deleted_instance = instance.commit.delete
-        instance.deleted_at.should == deleted_instance.timestamp
-      end
-    end
-
-    context 'when not deleted' do
-      it 'should be nil' do
-        instance.commit
-        instance.deleted_at.should be_nil
-      end
     end
   end
 
@@ -152,13 +132,6 @@ describe MemoryModel::Base::Actions do
     end
   end
 
-  describe '#dup' do
-    it 'should perform a deep_dup' do
-      instance.should_receive(:deep_dup)
-      instance.dup
-    end
-  end
-
   describe '#deep_dup' do
     it 'should not be frozen' do
       dup = instance.freeze.deep_dup
@@ -183,14 +156,6 @@ describe MemoryModel::Base::Actions do
     it 'should be frozen' do
       instance.freeze
       instance.should be_frozen
-    end
-  end
-
-  describe '#restore' do
-    it 'should not be deleted' do
-      instance.commit.delete
-      restored_instance = instance.restore
-      restored_instance.should_not be_deleted
     end
   end
 

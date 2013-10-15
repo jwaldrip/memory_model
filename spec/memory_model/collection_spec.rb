@@ -25,43 +25,24 @@ describe MemoryModel::Collection do
     end
   end
 
+  describe '.index_names' do
+    it 'should return the name of all the indexes' do
+      allow(collection).to receive(:indexes).and_return({ foo: [], bar: [], baz: []})
+      collection.index_names.should include :foo, :bar, :baz
+    end
+  end
+
+  describe '.index_by' do
+    it 'should add a index key' do
+
+    end
+  end
+
   # Instance Methods
 
   describe '#all' do
     it 'should be an array' do
       collection.all.should be_a Array
-    end
-
-    it 'should call unique' do
-      collection.should_receive(:unique).and_return([])
-      collection.all
-    end
-
-    it 'should not contain deleted items' do
-      3.times { model.new.commit }
-      model.new.commit.delete
-      collection.all.each do |record|
-        record.should_not be_deleted
-      end
-    end
-  end
-
-  describe '#deleted' do
-    it 'should be an array' do
-      collection.deleted.should be_a Array
-    end
-
-    it 'should call unique' do
-      collection.should_receive(:unique).and_return([])
-      collection.deleted
-    end
-
-    it 'should contain deleted items' do
-      3.times { model.new.commit }
-      model.new.commit.delete
-      collection.deleted.each do |record|
-        record.should be_deleted
-      end
     end
   end
 
@@ -83,33 +64,6 @@ describe MemoryModel::Collection do
       expect { collection.find(instance.id) }.to raise_error MemoryModel::RecordNotFoundError
     end
 
-    context 'with the deleted option' do
-      it 'should return a deleted object with the deleted option' do
-        instance = model.new
-        instance.commit.delete
-        collection.find(instance.id, deleted: true).should be_present
-        collection.find(instance.id, deleted: true).should be_deleted
-        collection.find(instance.id, deleted: true).should be_frozen
-      end
-    end
-
-    context 'with a version' do
-      it 'should return a version' do
-        model.send(:field, :foo)
-        instance = model.new(foo: 'bar')
-        instance.commit
-        instance.foo = 'baz'
-        instance.commit
-        collection.find(instance.id, version: 1).foo.should == 'bar'
-      end
-
-      it 'should return previous version of a deleted object' do
-        instance = model.new
-        instance.commit.delete
-        expect { collection.find(instance.id) }.to raise_error MemoryModel::RecordNotFoundError
-        collection.find(instance.id, version: 1).should be_present
-      end
-    end
   end
 
   describe "#insert" do
@@ -127,7 +81,7 @@ describe MemoryModel::Collection do
       instance = model.new
       collection.insert instance
       collection.last.should == instance
-      collection.records(false).last.should be_frozen
+      collection.records.last.should be_frozen
     end
   end
 
@@ -151,24 +105,11 @@ describe MemoryModel::Collection do
       collection.instance_variable_set :@records, [mock_record]
     end
 
-    it 'should dup records' do
-      mock_record.should_receive(:dup)
-      collection.records
-    end
-
-    it 'should not dup records' do
-      mock_record.should_not_receive(:dup)
-      collection.records(false)
-    end
   end
 
   describe '#records' do
-    it 'should contain unfrozen duplicates' do
-      3.times { model.new.commit }
-      collection.records.each do |record|
-        record.should_not be_frozen
-      end
-      collection.records.size.should == 3
+    it 'should be an array' do
+      collection.records.should be_an Array
     end
   end
 
@@ -196,20 +137,6 @@ describe MemoryModel::Collection do
       item_2 = model.new.commit
       collection[1].should == item_1
       collection[0].should == item_2
-    end
-  end
-
-  describe '#unique' do
-    it 'should contain unique items' do
-      instance = model.new
-      3.times { instance.commit }
-      collection.send(:unique).size.should == 1
-      collection.records.size.should == 3
-    end
-
-    it 'should call sorted' do
-      collection.should_receive(:sorted).and_return([])
-      collection.send(:unique)
     end
   end
 

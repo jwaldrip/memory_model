@@ -24,8 +24,7 @@ module MemoryModel::Base::Actions
   end
 
   def delete
-    @deleted = true
-    commit
+    self.class.collection.remove(self)
     freeze
   end
 
@@ -41,10 +40,6 @@ module MemoryModel::Base::Actions
     run_callbacks :destroy do
       delete
     end
-  end
-
-  def dup
-    deep_dup
   end
 
   def deep_dup
@@ -69,13 +64,6 @@ module MemoryModel::Base::Actions
     end
   end
 
-  def restore
-    instance = frozen? ? self.dup : self
-    instance.instance_variable_set :@deleted, false
-    instance.save
-    instance
-  end
-
   module ClassMethods
 
     def create(attributes={})
@@ -83,11 +71,13 @@ module MemoryModel::Base::Actions
     end
 
     def delete_all
-      all.map(&:delete).reject(&:deleted?).empty?
+      count.tap do
+        self.collection.clear
+      end
     end
 
     def destroy_all
-      all.map(&:destroy).reject(&:deleted?).empty?
+      self.all.each(&:destroy)
     end
 
   end

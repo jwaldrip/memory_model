@@ -1,6 +1,6 @@
 require 'active_support/concern'
 
-module MemoryModel::Base::Collection
+module MemoryModel::Base::Collectible
   extend ActiveSupport::Concern
   extend ConcernedInheritance
 
@@ -9,7 +9,7 @@ module MemoryModel::Base::Collection
   end
 
   module ClassMethods
-    delegate :all, :find, :insert, :<<, :deleted, to: :collection
+    delegate *(MemoryModel::Collection.instance_methods - Object.instance_methods), to: :collection
     delegate :first, :last, to: :all
 
     def collection

@@ -1,9 +1,11 @@
 require "memory_model/version"
-require "memory_model/core_ext/object"
+require "active_support/dependencies/autoload"
 
 module MemoryModel
-  autoload :Collection, 'memory_model/collection'
-  autoload :Base, 'memory_model/base'
+  extend ActiveSupport::Autoload
+
+  autoload :Collection
+  autoload :Base
 
   class InvalidCollectionError < StandardError ; end
   class InvalidFieldError < StandardError ; end

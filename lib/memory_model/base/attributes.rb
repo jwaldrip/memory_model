@@ -28,7 +28,7 @@ module MemoryModel::Base::Attributes
                  else
                    "not initialized"
                  end
-    "#<#{[self.class, inspection].join(' ')}>"
+    super.sub /^(#<[a-z:0-9]+).*>/i, "\\1 #{inspection}>"
   end
 
   def read_attribute(name)

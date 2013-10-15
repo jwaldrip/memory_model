@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MemoryModel::Base::Collection do
+describe MemoryModel::Base::Collectible do
 
   let(:model) do
     Class.new(MemoryModel::Base) do
