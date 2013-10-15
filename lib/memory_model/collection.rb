@@ -103,10 +103,6 @@ class MemoryModel::Collection
     end
   end
 
-  def ids
-    indexes[:id].keys
-  end
-
   def insert(record)
     raise TypeError unless record.is_a? @model
     indexable_attributes = index_names.reduce({}) do |hash, attr|
@@ -127,9 +123,9 @@ class MemoryModel::Collection
   end
 
   def where(hash)
-    matched_ids = hash.symbolize_keys.reduce(self.ids) do |array, (attr, value)|
+    matched_ids = hash.symbolize_keys.reduce(__sids__) do |array, (attr, value)|
       records = indexes.has_key?(attr) ? where_in_index(attr, value) : where_in_all(attr, value)
-      array & records.map(&:id)
+      array & records.map(&:__sid__)
     end
     find_all(*matched_ids)
   end
@@ -154,6 +150,10 @@ class MemoryModel::Collection
 
   def records
     indexes[:__sid__].values
+  end
+
+  def __sids__
+    indexes[:__sid__].keys
   end
 
   def where_in_index(attr, value)
