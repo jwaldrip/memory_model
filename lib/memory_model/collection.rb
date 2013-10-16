@@ -7,21 +7,10 @@ class MemoryModel::Collection
   extend ActiveSupport::Autoload
 
   autoload :Index
-  autoload :IndexDefinitions
   autoload :MarshaledRecord
   autoload :LoaderDelegate
 
-  class RecordNotUnique < StandardError
-    def initialize(options)
-      options.assert_valid_keys :index, :value
-      @index_name = options[:index]
-      @value      = options[:value]
-    end
-
-    def message
-      "The index `#{@index_name}` is unique and already contains a record with the value of #{@value.inspect}"
-    end
-
+  class IndexError < MemoryModel::Error
   end
 
   class MissingPrimaryKey < StandardError
@@ -33,89 +22,91 @@ class MemoryModel::Collection
   end
 
   class << self
-    attr_accessor :all
+
+    # ensure it only uses the memory model collection instance variable
+    def all
+      MemoryModel::Collection.instance_variable_get(:@all) ||
+        MemoryModel::Collection.instance_variable_set(:@all, [])
+    end
+
   end
 
-  self.all = []
-
-  attr_reader :indexes, :primary_key
+  attr_reader :primary_key
   delegate *(LoaderDelegate.public_instance_methods - Object.instance_methods), :size, :length, :inspect, to: :all
 
-  def initialize(model = Class.new)
-    @model   = model
-    @indexes = Hash.new
-    add_index :__sid__, unique: true
-    self.class.all << self
+  ## Collection Setup and Methods
+
+  def initialize(model)
+    @model = model
+    set_primary_key :_uuid_, default: nil
   end
 
-  def add_index(key, options = {})
-    indexes[key.to_sym] ||= Index.new(key, options)
+  def add_index(name, options={})
+    type = :unique if options.delete(:unique)
+    type ||= options.delete(:type) || :multi
+    indexes[name] = Index.const_get(type.to_s.camelize).new(name, options)
+  rescue NameError => e
+    raise TypeError, "#{type.inspect} is not a valid index"
   end
 
   def set_primary_key(key, options={})
-    if options[:auto_increment] != false || options.has_key?(:default)
+    if options[:auto_increment] != false && !options.has_key?(:default)
       options[:auto_increment] = true
     end
+    options[:comparable] ||= false
     @model.field key, options
-    add_index key, unique: true
+    add_index key, type: :unique
     @primary_key = key
   end
 
-  def clear
-    indexes.each(&:clear)
+  ## Index Operations
+  def indexes
+    @indexes ||= {}
   end
 
   def index_names
     indexes.keys
   end
 
-  def all
-    LoaderDelegate.new(records)
+  ## Bulk Operations
+
+  def clear
+    indexes.each(&:clear)
   end
 
-  def find(id)
-    raise MissingPrimaryKey unless primary_key.present?
-    indexes[primary_key][id].load
+  def read_all(*ids)
+    return [] if ids.blank?
+    indexes[primary_key].values_at(*ids).compact
+  end
+
+  def load_all(*uuids)
+    return [] if uuids.blank?
+    indexes[:_uuid_].values_at(*uuids).compact.map(&:load)
+  end
+
+  ## Records
+
+  def count
+    indexes[:_uuid_]
+  end
+
+  def records
+    indexes[:_uuid_].values
+  end
+
+  ## Finders
+  def all
+    LoaderDelegate.new records
+  end
+
+  def find(key)
+    read(key).load
   rescue NoMethodError
-    raise(MemoryModel::RecordNotFoundError)
+    raise MemoryModel::RecordNotFoundError
   end
 
   def find_all(*ids)
-    ids.reduce([]) do |array, id|
-      begin
-        array << find(id)
-      rescue MemoryModel::RecordNotFoundError
-        nil
-      end
-      array
-    end
-  end
-
-  def insert(record)
-    raise TypeError unless record.is_a? @model
-    indexable_attributes = index_names.reduce({}) do |hash, attr|
-      hash.merge attr => record.public_send(attr)
-    end
-
-    assign_to_indexes indexable_attributes, record
-
-    self
-  end
-
-  alias :<< :insert
-
-  def remove(instance)
-    indexes.each do |key, records|
-      records.delete_if { |key, record| record.sid == instance.__sid__ }
-    end
-  end
-
-  def where(hash)
-    matched_ids = hash.symbolize_keys.reduce(__sids__) do |array, (attr, value)|
-      records = indexes.has_key?(attr) ? where_in_index(attr, value) : where_in_all(attr, value)
-      array & records.map(&:sid)
-    end
-    load_all(*matched_ids)
+    read_all(*ids).map(&:load)
   end
 
   def find_by(hash)
@@ -134,20 +125,83 @@ class MemoryModel::Collection
     find_by(hash) || model.create!(hash)
   end
 
+  def where(hash)
+    matched_ids = hash.symbolize_keys.reduce(_uuids_) do |array, (attr, value)|
+      records = indexes.has_key?(attr) ? where_in_index(attr, value) : where_in_all(attr, value)
+      array & records.compact.map(&:uuid)
+    end
+    load_all(*matched_ids)
+  end
+
+  ## CRUD Operations
+  def create(item)
+    item._uuid_ = SecureRandom.uuid
+    transact item, operation: :create, rollback_with: :delete
+  end
+
+  def read(key)
+    indexes[primary_key].read(key)
+  end
+
+  def update(item)
+    transact item, operation: :update, rollback_with: :rollback
+  end
+
+  def delete(item)
+    transact item, operation: :delete
+  end
+
+  # Collected Attributes
+  def _uuids_
+    indexes[:_uuid_].keys
+  end
+
+  ## Private Methods
   private
 
-  def load_all(*ids)
-    return [] if ids.blank?
-    indexes[:__sid__].values_at(*ids).map(&:load)
+  def transact(record, options={})
+    # Set up the index
+    successful_indexes = []
+
+    # Fetch the options
+    operation          = options[:operation] || :undefined
+    indexes            = options[:indexes] || self.indexes.values
+    rollback_operation = options[:rollback_with]
+
+    # Marshal the object
+    marshaled_record = MarshaledRecord.new(record)
+
+    # Do the transaction
+    indexes.map do |index|
+      send("#{operation}_with_index", index, record, marshaled_record).tap do
+        successful_indexes << index
+      end
+    end
+  rescue Exception => e
+    transact(record, operation: rollback_operation, indexes: successful_indexes) if rollback_operation
+    raise e
   end
 
-  def records
-    indexes[:__sid__].values
+  ## Transactors
+  def create_with_index(index, record, marshaled_record)
+    index.create record.read_attribute(index.name), marshaled_record
+  #rescue => e
+  #  binding.pry
   end
 
-  def __sids__
-    indexes[:__sid__].keys
+  def update_with_index(index, record, marshaled_record)
+    index.update record.read_attribute(index.name), marshaled_record
   end
+
+  def rollback_with_index(index, record, marshaled_record)
+    index.update record.changed_attributes[index.name], marshaled_record
+  end
+
+  def delete_with_index(index, record, marshaled_record)
+    index.delete marshaled_record.uuid
+  end
+
+  ## Typed Finders
 
   def where_in_index(attr, value)
     indexes[attr].where value
@@ -155,31 +209,6 @@ class MemoryModel::Collection
 
   def where_in_all(attr, value)
     all.select { |record| record.read_attribute(attr) == value }
-  end
-
-  def assign_to_indexes(hash, record)
-    marshaled_record = MarshaledRecord.new record
-    validate_for_indexing! hash, marshaled_record
-    hash.each do |attr, value|
-      indexes[attr].remove(record.changed_attributes[attr.to_s], marshaled_record)
-      indexes[attr].insert(value, marshaled_record)
-    end
-  end
-
-  def respond_to_missing?(m, include_private=false)
-    all.respond_to?(m, include_private)
-  end
-
-  def sort_by(attr)
-    records.sort { |(ak, av), (bk, bv)| av.public_send(attr) <=> bv.public_send(attr) }
-  end
-
-  def validate_for_indexing!(hash, marshaled_record)
-    hash.each do |attr, value|
-      unless indexes[attr].valid_object?(value, marshaled_record)
-        raise RecordNotUnique, index: attr, value: value
-      end
-    end
   end
 
 end

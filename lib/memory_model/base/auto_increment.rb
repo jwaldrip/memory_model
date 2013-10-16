@@ -9,7 +9,7 @@ module MemoryModel::Base::AutoIncrement
 
   def auto_increment_fields!
     fields.select { |field| field.options[:auto_increment] === true }.each do |field|
-      write_attribute(field.name, self.class.auto_increment_for!(:id))
+      write_attribute(field.name, self.class.auto_increment_for!(field.name))
     end
   end
 

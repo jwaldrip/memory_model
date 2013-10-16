@@ -18,27 +18,16 @@ module MemoryModel
     included do
       define_model_callbacks :create, :update, :save, :destroy, :validation
       define_model_callbacks :commit, only: :after
-      attr_reader :timestamp, :__sid__
       before_save(:remove_invalid_instance_vars)
     end
 
     VALID_IVARS = [
-      :@attributes,
-      :@timestamp,
-      :@__sid__
+      :@attributes
     ]
 
     def delete
-      self.class.collection.remove(self)
+      self.class.collection.delete(self)
       freeze
-    end
-
-    def deleted?
-      !!@deleted
-    end
-
-    def deleted_at
-      deleted? ? @timestamp : nil
     end
 
     def destroy
@@ -58,12 +47,10 @@ module MemoryModel
     private
 
     def commit
-      callback = persisted? ? :update : :create
-      run_callbacks callback do
+      operation = persisted? ? :update : :create
+      run_callbacks operation do
         run_callbacks :save do
-          @timestamp = Time.now
-          @__sid__   ||= SecureRandom.uuid
-          self.class.insert self
+          self.class.collection.send(operation, self)
           run_callbacks :commit
         end
       end

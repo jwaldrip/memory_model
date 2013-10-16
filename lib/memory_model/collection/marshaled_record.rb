@@ -1,9 +1,9 @@
 class MemoryModel::Collection::MarshaledRecord
 
-  attr_reader :sid, :string
+  attr_reader :uuid, :string
 
   def initialize(record)
-    @sid = record.__sid__
+    @uuid = record._uuid_
     @string = Marshal.dump record
     freeze
   end
@@ -13,7 +13,7 @@ class MemoryModel::Collection::MarshaledRecord
   end
 
   def ==(other_object)
-    sid == other_object.try(:sid)
+    uuid == other_object.try(:uuid)
   end
 
 end

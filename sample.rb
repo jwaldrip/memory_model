@@ -38,8 +38,8 @@ def benchmark_average(count, name = nil, graph = false, &block)
 
 end
 
-benchmark_average(10000, 'create', true) { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
+benchmark_average(1000, 'create', true) { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
 
 binding.pry
 
-record = Foo.find Foo.ids.sample
+# record = Foo.find Foo.ids.sample

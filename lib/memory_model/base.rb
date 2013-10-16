@@ -54,10 +54,8 @@ class MemoryModel::Base
   end
 
   def initialize_dup(other)
-    self.attributes = other.attributes
-    @__side
+    @attributes = other.attributes.dup
     reset_incremented_fields!
-    super
   end
 
 end

@@ -1,7 +1,7 @@
 module MemoryModel::Base::Persistence
 
   def persisted?
-    !!self.class.find_by(__sid__: self.__sid__)
+    !!self.class.find_by(_uuid_: self._uuid_)
   end
 
   alias :exists? :persisted?

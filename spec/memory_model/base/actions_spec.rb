@@ -59,16 +59,6 @@ describe MemoryModel::Base::Actions do
     it 'should save to the collection' do
       expect { instance.send(:commit) }.to change { model.all.to_a }
     end
-
-    it 'should always be the latest record' do
-      instance.send(:commit)
-      instance.send(:commit).timestamp.should == model.find(instance.id).timestamp
-    end
-
-    it 'should have a timestamp' do
-      instance.send(:commit)
-      instance.timestamp.should be_present
-    end
   end
 
   describe '#delete' do
@@ -144,7 +134,7 @@ describe MemoryModel::Base::Actions do
       it 'should run the callback' do
         model.before_save :test_method
         instance.should_receive(:test_method) do
-          instance.class.should_receive(:insert).and_return(instance)
+          expect(model.collection).to receive(:transact)
         end
         instance.save
       end
@@ -152,7 +142,7 @@ describe MemoryModel::Base::Actions do
       it 'should execution if the callback returns false' do
         model.before_save :test_method
         instance.should_receive(:test_method).and_return(false)
-        instance.class.should_not_receive(:insert)
+        expect(model.collection).to_not receive(:transact)
         instance.save
       end
     end
@@ -160,8 +150,8 @@ describe MemoryModel::Base::Actions do
     context 'with an after_save callback' do
       it 'should run the callback' do
         model.after_save :test_method
-        instance.class.should_receive(:insert) do
-          instance.should_receive(:test_method)
+        expect(model.collection).to receive(:transact) do
+          expect(instance).to receive(:test_method)
         end
         instance.save
       end
@@ -176,7 +166,7 @@ describe MemoryModel::Base::Actions do
           test_method_b
         end
         instance.should_receive(:test_method_a) do
-          instance.class.should_receive(:insert) do
+          expect(model.collection).to receive(:transact) do
             instance.should_receive(:test_method_b)
           end
         end
@@ -189,7 +179,7 @@ describe MemoryModel::Base::Actions do
         it 'should run the callback' do
           model.before_create :test_method
           instance.should_receive(:test_method) do
-            instance.class.should_receive(:insert).and_return(true)
+            expect(model.collection).to receive(:transact)
           end
           instance.save
         end
@@ -197,7 +187,7 @@ describe MemoryModel::Base::Actions do
         it 'should execution if the callback returns false' do
           model.before_create :test_method
           instance.should_receive(:test_method).and_return(false)
-          instance.class.should_not_receive(:insert)
+          instance.class.should_not_receive(:transact)
           instance.save
         end
       end
@@ -205,7 +195,7 @@ describe MemoryModel::Base::Actions do
       context 'with an after_create callback' do
         it 'should run the callback' do
           model.after_create :test_method
-          instance.class.should_receive(:insert) do
+          expect(model.collection).to receive(:transact) do
             instance.should_receive(:test_method)
           end
           instance.save
@@ -221,7 +211,7 @@ describe MemoryModel::Base::Actions do
             test_method_b
           end
           instance.should_receive(:test_method_a) do
-            instance.class.should_receive(:insert) do
+            expect(model.collection).to receive(:transact) do
               instance.should_receive(:test_method_b)
             end
           end
@@ -245,7 +235,7 @@ describe MemoryModel::Base::Actions do
         it 'should run the callback' do
           model.before_update :test_method
           instance.should_receive(:test_method) do
-            instance.class.should_receive(:insert).and_return(true)
+            expect(model.collection).to receive(:transact)
           end
           instance.save
         end
@@ -253,7 +243,7 @@ describe MemoryModel::Base::Actions do
         it 'should execution if the callback returns false' do
           model.before_update :test_method
           instance.should_receive(:test_method).and_return(false)
-          instance.class.should_not_receive(:insert)
+          instance.class.should_not_receive(:transact)
           instance.save
         end
       end
@@ -261,7 +251,7 @@ describe MemoryModel::Base::Actions do
       context 'with an after_update callback' do
         it 'should run the callback' do
           model.after_update :test_method
-          instance.class.should_receive(:insert) do
+          expect(model.collection).to receive(:transact) do
             instance.should_receive(:test_method)
           end
           instance.save
@@ -277,7 +267,7 @@ describe MemoryModel::Base::Actions do
             test_method_b
           end
           instance.should_receive(:test_method_a) do
-            instance.class.should_receive(:insert) do
+            expect(model.collection).to receive(:transact) do
               instance.should_receive(:test_method_b)
             end
           end
@@ -288,7 +278,7 @@ describe MemoryModel::Base::Actions do
       context 'it should not call an create callback' do
         it 'should run the callback' do
           model.before_create :test_method
-          instance.class.should_receive(:insert)
+          expect(model.collection).to receive(:transact)
           instance.should_not_receive(:test_method)
           instance.save
         end

@@ -63,21 +63,6 @@ describe MemoryModel::Collection do
 
   end
 
-  describe "#insert" do
-    it 'should duplicate a record being inserted' do
-      instance = model.new
-      instance.should_receive :dup
-      collection.insert instance
-    end
-
-    it 'should freeze a record being inserted' do
-      instance = model.new
-      collection.insert instance
-      collection.last.should == instance
-      collection.send(:records).last.should be_frozen
-    end
-  end
-
   describe '#inspect' do
     it 'should delegate inspect to all' do
       all_mock = double
@@ -103,15 +88,6 @@ describe MemoryModel::Collection do
   describe '#records' do
     it 'should be an array' do
       collection.send(:records).should be_an Array
-    end
-  end
-
-  describe '#respond_to_missing?' do
-    it 'should check if all responds to' do
-      all_mock = double
-      all_mock.should_receive(:respond_to?)
-      collection.stub(:all).and_return(all_mock)
-      collection.send :respond_to_missing?, :test_method
     end
   end
 

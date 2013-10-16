@@ -30,5 +30,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'terminal-notifier-guard'
   gem.add_development_dependency 'test-unit'
   gem.add_development_dependency 'coveralls'
+  gem.add_development_dependency 'pry'
+  gem.add_development_dependency 'pry-stack_explorer'
 
 end
