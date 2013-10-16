@@ -1,4 +1,4 @@
-module MemoryModel::Collection::MultiIndexMethods
+module MemoryModel::Collection::Index::MultiIndexMethods
   extend MemoryModel::Collection::IndexDefinitions
 
   valid_object? do |*args|

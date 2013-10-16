@@ -7,11 +7,8 @@ class MemoryModel::Collection
   extend ActiveSupport::Autoload
 
   autoload :Index
-  autoload :UniqueIndexMethods
-  autoload :MultiIndexMethods
   autoload :IndexDefinitions
   autoload :MarshaledRecord
-  autoload :AllowNilMethods
   autoload :LoaderDelegate
 
   class RecordNotUnique < StandardError
@@ -52,22 +49,7 @@ class MemoryModel::Collection
   end
 
   def add_index(key, options = {})
-    indexes[key.to_sym] ||= extend_index_from_options Index.new(key), options
-  end
-
-  def extend_index_from_options(index, options={})
-    index.tap do
-      index.extend options.delete(:unique) ? UniqueIndexMethods : MultiIndexMethods
-      options.each do |key, bool|
-        const = case key
-                when String, Symbol
-                  self.class.const_get key.to_s.camelize + 'Methods'
-                when Module
-                  key
-                end
-        index.extend const if bool
-      end
-    end
+    indexes[key.to_sym] ||= Index.new(key, options)
   end
 
   def set_primary_key(key, options={})

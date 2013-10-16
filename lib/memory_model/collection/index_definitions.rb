@@ -31,6 +31,12 @@ module MemoryModel::Collection::IndexDefinitions
 
   private
 
+  def const_missing(const)
+    parent.const_get(const)
+  rescue NameError
+    super
+  end
+
   def check_block_arguments!(method, *counts, &block)
     message_counts = counts.dup
     last_count = message_counts.pop

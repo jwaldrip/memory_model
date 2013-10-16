@@ -1,4 +1,4 @@
-module MemoryModel::Collection::UniqueIndexMethods
+module MemoryModel::Collection::Index::UniqueIndexMethods
   extend MemoryModel::Collection::IndexDefinitions
 
   valid_object? do |index_value, record|
