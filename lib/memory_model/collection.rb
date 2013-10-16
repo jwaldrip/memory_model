@@ -87,7 +87,7 @@ class MemoryModel::Collection
   ## Records
 
   def count
-    indexes[:_uuid_]
+    _uuids_.count
   end
 
   def records
