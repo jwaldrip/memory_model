@@ -1,3 +1,7 @@
+require 'active_support/core_ext/module/delegation'
+require 'active_support/core_ext/hash/indifferent_access'
+require 'active_support/hash_with_indifferent_access'
+
 module MemoryModel::Base::Attributes
   extend ActiveSupport::Concern
   include ActiveModel::AttributeMethods
@@ -29,16 +33,13 @@ module MemoryModel::Base::Attributes
   end
 
   def inspect
-    inspection = if attributes.present?
-                   fields.reduce([]) { |array, field|
+    inspection = fields.reduce([]) { |array, field|
                      name = field.name
                      array << "#{name}: #{attribute_for_inspect(name)}" if has_attribute?(name)
                      array
                    }.join(", ")
-                 else
-                   "not initialized"
-                 end
-    super.sub /^(#<[a-z:0-9]+) .*>/i, "\\1#{inspection}>"
+    inspection = ' ' + inspection if inspection.present?
+    super.sub /^(#<[a-z:0-9]+).*>/i, "\\1#{inspection}>"
   end
 
   def read_attribute(name)
@@ -73,14 +74,12 @@ module MemoryModel::Base::Attributes
     end
   end
 
-  private
-
-  def reset_attribute_to_default!(attr)
-    write_attribute attr, fields.default_values(self).with_indifferent_access[attr]
-  end
-
   def clear_attribute(attr)
     write_attribute attr, nil
+  end
+
+  def reset_attribute_to_default!(attr)
+    fields.set_default_value(self, attr)
   end
 
 end

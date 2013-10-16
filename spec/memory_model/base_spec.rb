@@ -27,10 +27,6 @@ describe MemoryModel::Base do
     it 'should have a field set' do
       model.fields.should be_a MemoryModel::Base::Fields::FieldSet
     end
-
-    it 'should have an id field' do
-      model.fields.should include :id
-    end
   end
 
   context "when inherited" do
@@ -39,12 +35,17 @@ describe MemoryModel::Base do
         field :foo
       end
     end
-    let(:value) { 'bar' }
-    subject(:instance) { model.new(foo: value) }
+    let(:attributes) { { foo: 'bar' } }
+    subject(:instance) { model.new(attributes) }
 
     describe '.new' do
-      it 'should have an id' do
-        model.new.id.should be_present
+      it 'should set the default values' do
+        expect_any_instance_of(MemoryModel::Base::Fields::FieldSet).to receive(:set_default_values).with(an_instance_of(model), attributes)
+        instance
+      end
+
+      it 'should run initialize callbacks' do
+        pending
       end
     end
   end

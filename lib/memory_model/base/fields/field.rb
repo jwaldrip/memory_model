@@ -1,9 +1,8 @@
 class MemoryModel::Base::Fields::Field
 
   attr_reader :name, :options
-  delegate :inspect, to: :to_sym
 
-  def initialize(name, options={ })
+  def initialize(name, options={})
     @name    = name.to_sym
     @options = options.reverse_merge!({ readonly: false, comparable: true })
   end

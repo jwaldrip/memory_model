@@ -47,7 +47,7 @@ describe MemoryModel::Base::Operations::Comparisons do
     end
 
     context 'given an instance of a different class' do
-      let(:other_class) { Class.new(MemoryModel::Base) }
+      let(:other_class) { model.dup }
       let(:valid_instance) { other_class.new(foo: value) }
       let(:invalid_instance) { other_class.new(foo: 'baz') }
       it 'should be true when given a valid instance' do
@@ -98,7 +98,7 @@ describe MemoryModel::Base::Operations::Comparisons do
     end
 
     context 'given an instance of a different class' do
-      let(:other_class) { Class.new(MemoryModel::Base) }
+      let(:other_class) { model.dup }
       let(:valid_instance) { other_class.new(foo: value) }
       let(:invalid_instance) { other_class.new(foo: 'baz') }
       it 'should be true when given a valid instance' do
@@ -145,7 +145,7 @@ describe MemoryModel::Base::Operations::Comparisons do
     end
 
     context 'given an instance of a different class' do
-      let(:other_class) { Class.new(MemoryModel::Base) }
+      let(:other_class) { model.dup }
       let(:other_instance) { other_class.new(foo: value) }
       it 'should be false' do
         (instance === other_instance).should be_false

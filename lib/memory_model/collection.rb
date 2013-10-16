@@ -1,5 +1,7 @@
+require 'active_support/core_ext/hash/indifferent_access'
 require 'active_support/hash_with_indifferent_access'
 require 'active_support/dependencies/autoload'
+require 'active_support/core_ext/module/delegation'
 
 class MemoryModel::Collection
   extend ActiveSupport::Autoload
@@ -40,7 +42,7 @@ class MemoryModel::Collection
   self.all = []
 
   attr_reader :indexes, :primary_key
-  delegate *(Enumerable.public_instance_methods - Object.instance_methods), :inspect, to: :all
+  delegate *(LoaderDelegate.public_instance_methods - Object.instance_methods), :size, :length, :inspect, to: :all
 
   def initialize(model = Class.new)
     @model   = model
@@ -68,7 +70,11 @@ class MemoryModel::Collection
     end
   end
 
-  def set_primary_key(key)
+  def set_primary_key(key, options={})
+    if options[:auto_increment] != false || options.has_key?(:default)
+      options[:auto_increment] = true
+    end
+    @model.field key, options
     add_index key, unique: true
     @primary_key = key
   end

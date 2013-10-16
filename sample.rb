@@ -2,13 +2,13 @@ require 'memory_model'
 require 'pry'
 
 class Foo < MemoryModel::Base
-  field :id, auto_increment: true
+  set_primary_key :id
+
   field :first_name
   field :last_name
   field :email
   field :age
 
-  set_primary_key :id
   add_index :last_name
   add_index :first_name
   add_index :email, unique: true, allow_nil: true

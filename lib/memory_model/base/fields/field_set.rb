@@ -1,49 +1,49 @@
-require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/hash/indifferent_access'
+require 'active_support/hash_with_indifferent_access'
 require 'active_support/core_ext/string'
 require 'set'
 
-class MemoryModel::Base::Fields::FieldSet
-
-  Field = parent::Field
-
-  attr_reader :fields
-  delegate *(Array.public_instance_methods - Object.instance_methods), :inspect, to: :fields
-
-  def initialize
-    @fields = []
-  end
+class MemoryModel::Base::Fields::FieldSet < Set
 
   def [](name)
-    @fields.find { |f| f.name == name.to_sym }
+    find { |f| f.name == name.to_sym }
   end
 
-  def <<(attr)
-    attr = Field.new(attr) unless attr.is_a? Field
-    @fields << attr
+  def add(name, options={})
+    delete_if { |f| f == name }
+    self << MemoryModel::Base::Fields::Field.new(name, options)
   end
 
-  def add(attr, options={})
-    @fields.delete_if { |f| f == attr }
-    @fields << Field.new(attr, options)
+  def include?(name)
+    self[name].present?
   end
 
   def comparable
-    @fields.select(&:comparable?).map(&:to_sym)
+    select(&:comparable?).map(&:to_sym)
   end
 
   def set_default_values(model, attributes={})
-    attrs = @fields.reduce(attributes.symbolize_keys) do |attrs, field|
-      default = field.default
-      attrs.reverse_merge field.name => begin
-        send("default_values_for_#{default.class.name.underscore}", model, default)
-      rescue NoMethodError => e
-        raise ArgumentError, "#{default} must be a string, symbol, lambda or proc"
-      end
+    model.attributes = self.map(&:name).reduce(attributes.with_indifferent_access) do |hash, field|
+      hash[field] ||= fetch_default_value(model, field)
+      hash
     end
-    model.attributes = attrs
   end
 
-  def default_values_for_proc(model, proc)
+  def set_default_value(model, field)
+    model.write_attribute field, fetch_default_value(model, field)
+  end
+
+  def fetch_default_value(model, field)
+    default = self[field].default
+    send("fetch_value_using_#{default.class.name.underscore}", model, default)
+  rescue NoMethodError => e
+    raise ArgumentError, "#{default} must be a string, symbol, lambda or proc"
+  end
+
+  private
+
+  def fetch_value_using_proc(model, proc)
+    raise TypeError, 'value must be a Proc' unless proc.is_a? Proc
     if proc.lambda? && proc.arity == 0
       proc.call
     elsif proc.arity < 1
@@ -55,19 +55,20 @@ class MemoryModel::Base::Fields::FieldSet
     end
   end
 
-  def default_values_for_string(model, string)
+  def fetch_value_using_string(model, string)
+    raise TypeError, 'value must be a String' unless string.is_a? String
     string
   end
 
-  def default_values_for_symbol(model, symbol)
+  def fetch_value_using_symbol(model, symbol)
+    raise TypeError, 'value must be a Symbol' unless symbol.is_a? Symbol
     model.instance_eval(&symbol)
   end
 
-  def default_values_for_nil_class(model, symbol)
+  def fetch_value_using_nil_class(model, nil_object)
+    raise TypeError, 'value must be a NilClass' unless nil_object.is_a? NilClass
     nil
   end
-
-  private
 
   def method_missing(m, *args, &block)
     if to_a.respond_to? m

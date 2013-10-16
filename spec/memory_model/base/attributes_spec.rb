@@ -3,10 +3,11 @@ require 'spec_helper'
 describe MemoryModel::Base::Attributes do
 
   let(:model) do
-    Class.new(MemoryModel::Base) do
+    klass = Class.new(MemoryModel::Base) do
       field :foo
       field :bar
     end
+    stub_const 'MyModel', klass
   end
   let(:instance) do
     model.new
@@ -48,7 +49,7 @@ describe MemoryModel::Base::Attributes do
       end
     end
 
-    context 'given an emtpy Hash' do
+    context 'given an empty Hash' do
       it 'should be true' do
         instance.foo = {}
         instance.has_attribute?(:foo).should be_false
@@ -68,9 +69,6 @@ describe MemoryModel::Base::Attributes do
       end
     end
 
-    it 'should read not initialized' do
-      model.allocate.inspect.should match /not initialized/
-    end
   end
 
   describe '#read_attribute' do

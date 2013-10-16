@@ -1,4 +1,5 @@
 require 'active_support/concern'
+require 'active_support/core_ext/module/delegation'
 
 module MemoryModel::Base::Collectible
   extend ActiveSupport::Concern

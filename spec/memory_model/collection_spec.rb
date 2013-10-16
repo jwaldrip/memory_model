@@ -3,19 +3,18 @@ require 'spec_helper'
 describe MemoryModel::Collection do
 
   let(:klass) { MemoryModel::Collection }
-  let(:model) { Class.new(MemoryModel::Base) }
-  subject(:collection) { model.collection }
-  before(:each) do
+  let(:model) do
+    model = Class.new(MemoryModel::Base) do
+      set_primary_key :id
+    end
     stub_const('MyModel', model)
   end
+
+  subject(:collection) { model.collection }
 
   describe '.new' do
     it 'should be empty' do
       collection.size.should == 0
-    end
-
-    it 'should be present' do
-      klass.all.should include collection
     end
   end
 
@@ -42,35 +41,29 @@ describe MemoryModel::Collection do
 
   describe '#all' do
     it 'should be an array' do
-      collection.all.should be_a Array
+      collection.all.should be_a MemoryModel::Collection::LoaderDelegate
     end
   end
 
   describe '#find' do
     it 'should return a single object' do
-      id = model.new.commit.id
+      id = model.create.id
       collection.find(id).should be_present
     end
 
     it 'should have unfrozen attributes' do
-      instance = model.new
-      instance.commit
+      instance = model.create
       collection.find(instance.id).instance_variable_get(:@attributes).should_not be_frozen
     end
 
     it 'should not return a deleted object' do
-      instance = model.new
-      instance.commit.delete
+      instance = model.create.delete
       expect { collection.find(instance.id) }.to raise_error MemoryModel::RecordNotFoundError
     end
 
   end
 
   describe "#insert" do
-    it 'should raise an error for an invalid object' do
-      expect { collection.insert Object.new }.to raise_error MemoryModel::Collection::InvalidTypeError
-    end
-
     it 'should duplicate a record being inserted' do
       instance = model.new
       instance.should_receive :dup
@@ -81,7 +74,7 @@ describe MemoryModel::Collection do
       instance = model.new
       collection.insert instance
       collection.last.should == instance
-      collection.records.last.should be_frozen
+      collection.send(:records).last.should be_frozen
     end
   end
 
@@ -109,16 +102,7 @@ describe MemoryModel::Collection do
 
   describe '#records' do
     it 'should be an array' do
-      collection.records.should be_an Array
-    end
-  end
-
-  describe '#method_missing' do
-    it 'should delegate method to all' do
-      all_mock = double
-      all_mock.should_receive(:test_method)
-      collection.stub(:all).and_return(all_mock)
-      collection.test_method
+      collection.send(:records).should be_an Array
     end
   end
 
@@ -128,15 +112,6 @@ describe MemoryModel::Collection do
       all_mock.should_receive(:respond_to?)
       collection.stub(:all).and_return(all_mock)
       collection.send :respond_to_missing?, :test_method
-    end
-  end
-
-  describe 'sorted' do
-    it 'should be sorted by timestamp, with most recent first' do
-      item_1 = model.new.commit
-      item_2 = model.new.commit
-      collection[1].should == item_1
-      collection[0].should == item_2
     end
   end
 

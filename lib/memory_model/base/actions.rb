@@ -48,11 +48,11 @@ module MemoryModel
     end
 
     def save(options={})
-      perform_validations(options) ? commit : false
+      !!perform_validations(options) ? commit : false
     end
 
     def save!(options={})
-      perform_validations(options) ? commit : raise(RecordInvalid.new(self))
+      !!perform_validations(options) ? commit : raise(RecordInvalid.new(self))
     end
 
     private

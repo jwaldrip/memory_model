@@ -14,7 +14,7 @@ describe MemoryModel::Base::Persistence do
 
   describe '#persisted?' do
     it 'should be true if persisted' do
-      instance.commit
+      instance.save
       instance.persisted?.should be_true
     end
 
@@ -25,7 +25,7 @@ describe MemoryModel::Base::Persistence do
 
   describe '#new_record?' do
     it 'should be true unless persisted' do
-      instance.commit
+      instance.save
       instance.new_record?.should be_false
     end
 
