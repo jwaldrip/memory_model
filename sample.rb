@@ -13,21 +13,32 @@ class Foo < MemoryModel::Base
   add_index :first_name
   add_index :email, unique: true, allow_nil: true
 
-  validates_presence_of :email
 end
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-require 'benchmark'
+def benchmark_average(count, name = nil, graph = false, &block)
+  times                                 = count.times.map do
+    st = Time.now
+    block.call
+    (Time.now - st).tap do |seconds|
+      print (seconds * 10000).to_i.times.map {'.'}.join + "\n" if graph
+    end
+  end
+  total                                 = times.reduce(:+)
+  shortest_milliseconds, shortest_index = times.map { |t| t * 1000 }.each_with_index.sort { |(timea, ia), (timeb, ib)| timea <=> timeb }.first
+  longest_milliseconds, longest_index   = times.map { |t| t * 1000 }.each_with_index.sort { |(timea, ia), (timeb, ib)| timea <=> timeb }.reverse.first
+  milliseconds_avg                      = (total / count) * 1000
+  puts "when executing #{name}",
+       "#{count} times",
+       "executions took an average of #{milliseconds_avg} milliseconds",
+       "and a total of #{total.round(2)} seconds",
+       "shortest was execution ##{shortest_index} lasting #{shortest_milliseconds} milliseconds",
+       "longest was execution ##{longest_index} lasting #{longest_milliseconds} milliseconds"
 
-n = 10000
-
-def benchmark_average(count, name = nil, &block)
-  milliseconds = (count.times.map { Benchmark.measure &block }.map(&:total).reduce(:+) / count) * 1000
-  [name, "took an average of #{milliseconds} milliseconds"].compact.join(' ')
 end
 
-puts benchmark_average(10000, 'create') { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
+benchmark_average(10000, 'create', true) { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
 
 binding.pry
 
