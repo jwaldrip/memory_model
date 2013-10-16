@@ -1,5 +1,7 @@
 require 'concerned_inheritance'
-require 'active_support/all'
+require 'active_support/core_ext/object'
+require 'active_support/core_ext/hash'
+require 'active_support/dependencies/autoload'
 require 'active_model'
 
 class MemoryModel::Base
@@ -53,7 +55,7 @@ class MemoryModel::Base
 
   def initialize_dup(other)
     self.attributes = other.attributes
-    @__sid__ = nil
+    @__side
     reset_incremented_fields!
     super
   end
