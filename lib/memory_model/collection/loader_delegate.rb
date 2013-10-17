@@ -20,9 +20,9 @@ module MemoryModel
         end
       end
 
-      delegate_and_load :first, :last
+      delegate_and_load :first, :last, :sample
       delegate :count, :size, :length, :present?, :blank?, to: :@records
-      delegate :inspect, to: :loaded_records
+      delegate :to_s, :pretty_inspect, :inspect, to: :loaded_records
 
       def initialize(records)
         @records = records
