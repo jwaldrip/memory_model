@@ -75,8 +75,6 @@ def benchmark_average(count, name = nil, options={}, &block)
        '',
        '###############################################################################'
 
-  GC.start
-
 end
 
 def gather_attributes!

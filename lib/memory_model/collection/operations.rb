@@ -4,6 +4,8 @@ module MemoryModel
 
       def clear
         indexes.each { |name, index| index.clear }
+        GC.start
+        all
       end
 
       def read_all(*ids)
