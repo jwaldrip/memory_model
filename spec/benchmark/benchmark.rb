@@ -5,7 +5,6 @@ require 'pry'
 
 class Foo < MemoryModel::Base
 
-  binding.pry
   set_primary_key :id
 
   field :first_name
@@ -19,7 +18,9 @@ class Foo < MemoryModel::Base
 
 end
 
-# ----------------------------------------------------------------------------------------------------------------------
+puts '',
+     '########## CURRENT BENCHMARK ##########',
+     ''
 
 def benchmark_average(count, name = nil, graph = false, &block)
   times                                 = count.times.map do
@@ -44,8 +45,9 @@ end
 
 benchmark_average(1000, 'create') { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
 
-# binding.pry
+puts '',
+     'here\'s a sample record:',
+     Foo.sample.inspect
 
 puts '',
-     'here\'s a sampled record:',
-     Foo.sample.inspect
+     '#######################################'
