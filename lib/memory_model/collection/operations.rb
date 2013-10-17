@@ -3,7 +3,7 @@ module MemoryModel
     module Operations
 
       def clear
-        indexes.each(&:clear)
+        indexes.each { |name, index| index.clear }
       end
 
       def read_all(*ids)
