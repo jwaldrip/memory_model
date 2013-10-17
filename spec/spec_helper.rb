@@ -13,6 +13,20 @@ SimpleCov.start
 
 require 'memory_model'
 
+def eager_load_all!(constants)
+  constants = [constants].flatten
+  constants.each do |constant|
+    constant.eager_load! if constant.respond_to? :eager_load!
+    begin
+      eager_load_all! constant.constants.map { |c| constant.const_get c }
+    rescue NoMethodError, SystemStackError
+      nil
+    end
+  end
+end
+
+eager_load_all! MemoryModel
+
 Dir["./spec/support/**/*.rb"].sort.each {|f| require f}
 
 RSpec.configure do |config|

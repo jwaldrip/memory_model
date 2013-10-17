@@ -14,7 +14,6 @@ module MemoryModel
 
     autoload :Fields
     autoload :Collectible
-    autoload :Comparison
     autoload :Actions
     autoload :Attributes
     autoload :Persistence
