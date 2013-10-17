@@ -14,7 +14,7 @@ module MemoryModel
 
         def add(name, options={})
           delete_if { |f| f == name }
-          self << MemoryModel::Base::Fields::Field.new(name, options)
+          self << Field.new(name, options)
         end
 
         def include?(name)
