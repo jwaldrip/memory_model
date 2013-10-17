@@ -3,15 +3,28 @@ module MemoryModel
   class IndexError < Error
   end
 
+  class InvalidWhereQuery < IndexError
+
+    def initialize(matcher_class)
+      super "Unable to perform a where with #{matcher_class}"
+    end
+
+  end
+
+  class RecordNotInIndexError < IndexError
+
+    def initialize(item, index)
+      super "record `#{item.uuid}` is missing from index `#{index.name}`"
+    end
+
+  end
+
   class Collection
     class Index
       extend ActiveSupport::Autoload
 
       autoload :Unique
       autoload :Multi
-
-      InvalidWhereQuery  = Class.new MemoryModel::Collection::IndexError
-      RecordMissingError = Class.new MemoryModel::Collection::IndexError
 
       attr_reader :name, :options, :index
 
@@ -58,7 +71,7 @@ module MemoryModel
         send("where_using_#{matcher_class}", matcher)
       rescue NoMethodError
         respond_to?(:where_using_default, true) ? where_using_default(matcher) :
-          raise(InvalidWhereQuery, "Unable to perform a where with #{matcher_class}")
+          raise(InvalidWhereQuery, matcher_class)
       end
 
       # `values` should return the values of the index

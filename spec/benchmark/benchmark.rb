@@ -1,7 +1,11 @@
+require 'bundler'
+Bundler.setup(:default)
 require 'memory_model'
 require 'pry'
 
 class Foo < MemoryModel::Base
+
+  binding.pry
   set_primary_key :id
 
   field :first_name
@@ -38,8 +42,10 @@ def benchmark_average(count, name = nil, graph = false, &block)
 
 end
 
-benchmark_average(1000, 'create', true) { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
+benchmark_average(1000, 'create') { Foo.create first_name: ['Tom', 'Alex', 'Jason'].sample }
 
-binding.pry
+# binding.pry
 
-# record = Foo.find Foo.ids.sample
+puts '',
+     'here\'s a sampled record:',
+     Foo.sample.inspect
