@@ -31,5 +31,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'test-unit'
   gem.add_development_dependency 'coveralls'
   gem.add_development_dependency 'pry'
+  gem.add_development_dependency 'colorize'
+  gem.add_development_dependency 'faker'
 
 end
