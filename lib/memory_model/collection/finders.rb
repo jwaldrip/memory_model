@@ -1,6 +1,7 @@
 module MemoryModel
 
-  class RecordNotFoundError < Error ; end
+  class RecordNotFoundError < Error;
+  end
 
   class Collection
     module Finders
@@ -41,8 +42,12 @@ module MemoryModel
 
       def where(hash)
         matched_ids = hash.symbolize_keys.reduce(_uuids_) do |array, (attr, value)|
-          records = indexes.has_key?(attr) ? where_in_index(attr, value) : where_in_all(attr, value)
-          array & records.compact.map(&:uuid)
+          records = if indexes.has_key?(attr)
+                      where_in_index(attr, value).compact.map(&:uuid)
+                    else
+                      where_in_all(attr, value).map(&:_uuid_)
+                    end
+          array & records
         end
         load_all(*matched_ids)
       end
