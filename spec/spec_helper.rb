@@ -1,6 +1,7 @@
 require 'simplecov'
-require 'rspec/autorun'
 require 'coveralls'
+
+require 'rspec/autorun'
 require 'bundler/setup'
 require 'pry'
 
