@@ -39,7 +39,7 @@ module MemoryModel
         private
 
         def where_using_default(matcher)
-          index[matcher].values
+          Array.wrap index[matcher].try(:values)
         end
 
         def where_using_proc(matcher)
