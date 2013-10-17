@@ -100,9 +100,7 @@ n = 2500
 ## Creates
 
 # Benchmark Create
-benchmark_average(n, '.create', before_each: -> { gather_attributes! }, after_all: -> { clear! }) do
-  Foo.create $attributes
-end
+benchmark_average(n, '.create', before_each: -> { gather_attributes! }, after_all: -> { clear! }) { Foo.create $attributes }
 
 ## Reads
 
@@ -122,9 +120,9 @@ benchmark_average(1000, '.where (using loading)', before_each: -> { create_recor
 ## Updates
 
 # Benchmark Update
-benchmark_average(n, '.update', before_each: -> { create_record! }, after_all: -> { clear! }) { Foo.sample.save }
+benchmark_average(n, '.update', before_each: -> { $record = create_record! }, after_all: -> { clear! }) { $record.save }
 
 ## Deletes
 
 # Benchmark Delete
-benchmark_average(n, '.delete', before_each: -> { 2.times { create_record! } }, after_all: -> { clear! }) { Foo.sample.delete }
+benchmark_average(n, '.delete', before_each: -> { 2.times { create_record! } ; $record = Foo.sample }, after_all: -> { clear! }) { $record.delete }
