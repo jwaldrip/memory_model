@@ -11,7 +11,7 @@ module MemoryModel
 
         # `update` should find a record in the collection by its storage_id, remove it, and add with the new value.
         def update(key, item)
-          raise(RecordMissingError, 'unable to to find the record specified') unless exists? item
+          raise(RecordNotInIndexError, [self, item]) unless exists? item
           delete(item)
           create(key, item)
         end

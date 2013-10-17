@@ -13,7 +13,8 @@ module MemoryModel
 
   class RecordNotInIndexError < IndexError
 
-    def initialize(item, index)
+    def initialize(args)
+      item, index = args
       super "record `#{item.uuid}` is missing from index `#{index.name}`"
     end
 

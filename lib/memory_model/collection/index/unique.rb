@@ -3,15 +3,16 @@ module MemoryModel
   class NilValueError < IndexError
 
     def initialize(index)
-      "`#{index.name}` cannot be nil"
+      super "`#{index.name}` cannot be nil"
     end
 
   end
 
   class RecordNotUniqueError < IndexError
 
-    def initialize(index, key)
-      "`#{index.name}` with `#{key}` already exists"
+    def initialize(args)
+      index, key = args
+      super "`#{index.name}` with `#{key}` already exists"
     end
 
   end
@@ -26,14 +27,14 @@ module MemoryModel
         # exists in the index.
         def create(key, item)
           raise(NilValueError, self) if key.nil? && !options[:allow_nil]
-          raise(RecordNotUniqueError, index, key) if index.has_key?(key)
+          raise(RecordNotUniqueError, [self, key]) if index.has_key?(key)
           return if key.nil?
           index[key] = item
         end
 
         # `update` should find a record in the collection by its storage_id, remove it, and add with the new value.
         def update(key, item)
-          raise(RecordNotInIndexError, self, item) unless exists? item
+          raise(RecordNotInIndexError, [self, item]) unless exists? item
           delete(item.uuid)
           create(key, item)
         end
