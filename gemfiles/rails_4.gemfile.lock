@@ -22,6 +22,8 @@ GEM
       bundler
       rake
     atomic (1.1.14)
+    binding_of_caller (0.7.2)
+      debug_inspector (>= 0.0.1)
     builder (3.1.4)
     celluloid (0.15.2)
       timers (~> 1.1.0)
@@ -34,6 +36,7 @@ GEM
       simplecov (>= 0.7)
       term-ansicolor
       thor
+    debug_inspector (0.0.2)
     diff-lcs (1.2.4)
     ffi (1.9.0)
     formatador (0.2.4)
@@ -63,6 +66,9 @@ GEM
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
+    pry-stack_explorer (0.4.9.1)
+      binding_of_caller (>= 0.7)
+      pry (>= 0.9.11)
     rake (10.1.0)
     rb-fsevent (0.9.3)
     rb-inotify (0.9.2)
@@ -104,6 +110,8 @@ DEPENDENCIES
   guard-bundler
   guard-rspec
   memory_model!
+  pry
+  pry-stack_explorer
   rb-fsevent
   rspec
   simplecov

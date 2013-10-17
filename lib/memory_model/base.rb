@@ -4,58 +4,63 @@ require 'active_support/core_ext/hash'
 require 'active_support/dependencies/autoload'
 require 'active_model'
 
-class MemoryModel::Base
-  extend ActiveSupport::Autoload
-  extend ConcernedInheritance
+module MemoryModel
 
-  autoload :Fields
-  autoload :Collectible
-  autoload :Comparison
-  autoload :Actions
-  autoload :Attributes
-  autoload :Persistence
-  autoload :Operations
-  autoload :Conversion
-  autoload :AutoIncrement
+  class InvalidCollectionError < Error ; end
 
-  # Active Model Additions
-  extend ActiveModel::Callbacks
-  extend ActiveModel::Naming
-  extend ActiveModel::Translation
-  include ActiveModel::Conversion
-  include ActiveModel::Serialization
-  include ActiveModel::Validations
+  class Base
+    extend ActiveSupport::Autoload
+    extend ConcernedInheritance
 
-  # 3.2 Only Active Model Additions
-  if ActiveModel::VERSION::MAJOR < 4 || (ActiveModel::VERSION::MAJOR == 3 && ActiveModel::VERSION::MINOR > 2)
-    include ActiveModel::MassAssignmentSecurity
-    include ActiveModel::Observing
-  end
+    autoload :Fields
+    autoload :Collectible
+    autoload :Comparison
+    autoload :Actions
+    autoload :Attributes
+    autoload :Persistence
+    autoload :Operations
+    autoload :Conversion
+    autoload :AutoIncrement
 
-  # Memory Model Additions
-  include Fields
-  include Collectible
-  include Operations::Comparisons
-  include Actions
-  include Attributes
-  include Persistence
-  include Conversion
-  include AutoIncrement
+    # Active Model Additions
+    extend ActiveModel::Callbacks
+    extend ActiveModel::Naming
+    extend ActiveModel::Translation
+    include ActiveModel::Conversion
+    include ActiveModel::Serialization
+    include ActiveModel::Validations
 
-  # Active Model Callbacks
-  define_model_callbacks :initialize, only: [:after]
-
-  def initialize(attributes={ })
-    unless self.class.collection.is_a? MemoryModel::Collection
-      raise MemoryModel::InvalidCollectionError, "#{self.class} does not have an assigned collection"
+    # 3.2 Only Active Model Additions
+    if ActiveModel::VERSION::MAJOR < 4 || (ActiveModel::VERSION::MAJOR == 3 && ActiveModel::VERSION::MINOR > 2)
+      include ActiveModel::MassAssignmentSecurity
+      include ActiveModel::Observing
     end
-    fields.set_default_values(self, attributes)
-    run_callbacks :initialize
-  end
 
-  def initialize_dup(other)
-    @attributes = other.attributes.dup
-    reset_incremented_fields!
-  end
+    # Memory Model Additions
+    include Fields
+    include Collectible
+    include Operations::Comparisons
+    include Actions
+    include Attributes
+    include Persistence
+    include Conversion
+    include AutoIncrement
 
+    # Active Model Callbacks
+    define_model_callbacks :initialize, only: [:after]
+
+    def initialize(attributes={})
+      unless self.class.collection.is_a? MemoryModel::Collection
+        raise MemoryModel::InvalidCollectionError, "#{self.class} does not have an assigned collection"
+      end
+      fields.set_default_values(self, attributes)
+      run_callbacks :initialize
+    end
+
+    def initialize_dup(other)
+      @attributes = other.attributes.dup
+      reset_incremented_fields!
+    end
+
+  end
 end

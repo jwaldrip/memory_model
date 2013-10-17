@@ -1,6 +1,10 @@
-module MemoryModel::Base::Operations
-  extend ActiveSupport::Autoload
+module MemoryModel
+  class Base
+    module Operations
+      extend ActiveSupport::Autoload
 
-  autoload :Comparisons
+      autoload :Comparisons
 
+    end
+  end
 end

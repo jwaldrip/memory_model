@@ -1,107 +1,72 @@
-class MemoryModel::Collection::Index
-  extend ActiveSupport::Autoload
+module MemoryModel
 
-  autoload :Unique
-  autoload :Multi
-
-  InvalidWhereQuery  = Class.new MemoryModel::Collection::IndexError
-  RecordMissingError = Class.new MemoryModel::Collection::IndexError
-
-  attr_reader :name, :options, :index
-
-  delegate :clear, :keys, to: :index
-  delegate :count, to: :values
-
-  def initialize(name, options)
-    @name    = name
-    @options = options
-    @index   = {}
+  class IndexError < Error
   end
 
-  # This is the base index, each method below must be implemented on each subclass
+  class Collection
+    class Index
+      extend ActiveSupport::Autoload
 
-  # `create` should implement creating a new record, raising an error if an item with the matching storage id already
-  # exists in the index.
-  def create(key, item)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
+      autoload :Unique
+      autoload :Multi
 
-  # `update` should find a record in the collection by its storage_id, remove it, and add with the new value.
-  def update(key, item)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
+      InvalidWhereQuery  = Class.new MemoryModel::Collection::IndexError
+      RecordMissingError = Class.new MemoryModel::Collection::IndexError
 
-  # `read` should find a record in the collection by its indexed_value, remove it, and add with the new value.
-  def read(key)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
+      attr_reader :name, :options, :index
 
-  # `delete` should find a record in the collection by its indexed_value, and remove it.
-  def delete(key)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
+      delegate :clear, :keys, to: :index
+      delegate :count, to: :values
 
-  # `exists?` return whether or not an item with the given storage id exists.
-  def exists?(item)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
+      def initialize(name, options)
+        @name    = name
+        @options = options
+        @index   = {}
+      end
 
-  # `where` should allow me to specify complex arguments and return an array
-  def where(matcher)
-    matcher_class = matcher.class.name.underscore
-    send("where_using_#{matcher_class}", matcher)
-  rescue NoMethodError
-    respond_to?(:where_using_default, true) ? where_using_default(matcher) :
-      raise(InvalidWhereQuery, "Unable to perform a where with #{matcher_class}")
-  end
+      # This is the base index, each method below must be implemented on each subclass
 
-  # `values` should return the values of the index
-  def values
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
+      # `create` should implement creating a new record, raising an error if an item with the matching storage id already
+      # exists in the index.
+      def create(key, item)
+        raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
+      end
 
-end
+      # `update` should find a record in the collection by its storage_id, remove it, and add with the new value.
+      def update(key, item)
+        raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
+      end
 
-__END__
+      # `read` should find a record in the collection by its indexed_value, remove it, and add with the new value.
+      def read(key)
+        raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
+      end
 
-  extend ActiveSupport::Autoload
+      # `delete` should find a record in the collection by its indexed_value, and remove it.
+      def delete(key)
+        raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
+      end
 
-  autoload :UniqueIndexMethods
-  autoload :MultiIndexMethods
-  autoload :AllowNilMethods
+      # `exists?` return whether or not an item with the given storage id exists.
+      def exists?(item)
+        raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
+      end
 
-  attr_reader :name
+      # `where` should allow me to specify complex arguments and return an array
+      def where(matcher)
+        matcher_class = matcher.class.name.underscore
+        send("where_using_#{matcher_class}", matcher)
+      rescue NoMethodError
+        respond_to?(:where_using_default, true) ? where_using_default(matcher) :
+          raise(InvalidWhereQuery, "Unable to perform a where with #{matcher_class}")
+      end
 
-  def initialize(name, options={})
-    @name = name
-    extend options.delete(:unique) ? UniqueIndexMethods : MultiIndexMethods
-    options.each do |key, bool|
-      const = case key
-              when String, Symbol
-                self.class.const_get key.to_s.camelize + 'Methods'
-              when Module
-                key
-              end
-      extend const if bool
+      # `values` should return the values of the index
+      def values
+        raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
+      end
+
     end
-    super()
   end
-
-  def valid_object?(*args)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
-
-  def insert(*args)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
-
-  def remove(*args)
-    raise NotImplementedError, "#{__method__} has not been implemented for this #{name} index"
-  end
-
-  def where(*args)
-    raise NotImplementedError, "#{__method__} has not been implemented for the #{name} index"
-  end
-
 end
 

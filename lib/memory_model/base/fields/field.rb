@@ -1,40 +1,57 @@
-class MemoryModel::Base::Fields::Field
+module MemoryModel
 
-  attr_reader :name, :options
+  class InvalidFieldError < Error
 
-  def initialize(name, options={})
-    @name    = name.to_sym
-    @options = options.reverse_merge!({ readonly: false, comparable: true })
+    def initialize(name)
+      super("`#{name}` is not a valid field")
+    end
+
   end
 
-  def increment!
-    raise ArguementError, "#{name} is not incrementable" unless options[:auto_increment] === true
-    @incrementor ||= 0
-    @incrementor += 1
+  class ReadOnlyFieldError < Error
+
+    def initialize(name)
+      super("`#{name}` is read only")
+    end
+
   end
 
-  def ==(other_object)
-    self.to_sym == other_object.to_sym
-  end
+  class Base
+    module Fields
+      class Field
 
-  def comparable?
-    !!@options[:comparable]
-  end
+        attr_reader :name, :options
 
-  def default
-    @options[:default]
-  end
+        def initialize(name, options={})
+          @name    = name.to_sym
+          @options = options.reverse_merge!({ readonly: false, comparable: true })
+        end
 
-  def readonly?
-    !!@options[:readonly]
-  end
+        def ==(other_object)
+          self.to_sym == other_object.to_sym
+        end
 
-  def to_sym
-    @name.to_sym
-  end
+        def comparable?
+          !!@options[:comparable]
+        end
 
-  def to_s
-    @name.to_s
-  end
+        def default
+          @options[:default]
+        end
 
+        def readonly?
+          !!@options[:readonly]
+        end
+
+        def to_sym
+          @name.to_sym
+        end
+
+        def to_s
+          @name.to_s
+        end
+
+      end
+    end
+  end
 end
