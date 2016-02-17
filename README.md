@@ -1,12 +1,11 @@
 [![Version](http://allthebadges.io/jwaldrip/memory_model/badge_fury.png)](http://allthebadges.io/jwaldrip/memory_model/badge_fury)
-[![Dependencies](http://allthebadges.io/jwaldrip/memory_model/gemnasium.png)](http://allthebadges.io/jwaldrip/memory_model/gemnasium)
 [![Build Status](http://allthebadges.io/jwaldrip/memory_model/travis.png)](http://allthebadges.io/jwaldrip/memory_model/travis)
 [![Coverage](http://allthebadges.io/jwaldrip/memory_model/coveralls.png)](http://allthebadges.io/jwaldrip/memory_model/coveralls)
 [![Code Climate](http://allthebadges.io/jwaldrip/memory_model/code_climate.png)](http://allthebadges.io/jwaldrip/memory_model/code_climate)
 
 # MemoryModel
 
-TODO: Write a gem description
+An in memory model construct. Good for testing.
 
 ## Installation
 
