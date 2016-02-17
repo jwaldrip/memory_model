@@ -11,7 +11,7 @@ module MemoryModel
 
       included do
         delegate :to_hash, to: :attributes
-        attribute_method_affix :prefix => 'reset_', :suffix => '_to_default!'
+        attribute_method_affix prefix: 'reset_', suffix: '_to_default!'
         attribute_method_prefix 'clear_'
       end
 
@@ -54,7 +54,7 @@ module MemoryModel
         raise InvalidFieldError, name unless fields.include? name
         raise ReadOnlyFieldError, name if fields[name].options[:readonly] && persisted?
 
-        send "#{name}_will_change!" unless value == read_attribute(name) || new_record?
+        send "#{name}_will_change!" unless read_attribute(name) == value || new_record?
         attributes[name] = value
       end
 
