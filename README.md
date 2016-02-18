@@ -23,7 +23,44 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Creating a basic model
+
+```ruby
+class User < MemoryModel::Base
+    primary_key :id
+    
+    field :first_name
+    field :last_name
+end
+```
+
+### Creating Records
+
+```ruby
+User.create(first_name: 'jason')
+
+# OR
+
+User.new(first_name: 'jason').save
+```
+
+### Finding Records
+
+```ruby
+User.find(id)
+```
+
+### Updating Records
+
+```ruby
+User.find(id).update(first_name: 'larry')
+```
+
+### Deleting Records
+
+```ruby
+User.find(id).delete
+```
 
 ## Contributing
 
