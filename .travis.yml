@@ -3,8 +3,7 @@ sudo: required
 services:
   - docker
 
-before_install:
-  - docker build .
+install: docker build .
 
 script: docker run -e="CODECLIMATE_REPO_TOKEN=a91a047fa77c9b56bbd07cdd5ecddc3877515d8193adb6047eb67344d17580af" -it `docker build -q .` rspec
 cache: bundler
