@@ -1,6 +1,13 @@
 language: ruby
-sudo: false
-script: bundle exec rspec
+sudo: required
+services:
+  - docker
+
+before_install:
+  - env
+  - docker build
+
+script: docker run -it `docker build -q .` rspec
 cache: bundler
 
 addons:
