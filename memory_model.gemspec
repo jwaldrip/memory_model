@@ -21,7 +21,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activesupport', '>= 3.2'
   gem.add_dependency 'concerned_inheritance'
 
-  gem.add_development_dependency 'appraisal'
   gem.add_development_dependency 'guard-rspec'
   gem.add_development_dependency 'guard-bundler'
   gem.add_development_dependency 'rb-fsevent'
@@ -33,6 +32,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'pry'
   gem.add_development_dependency 'colorize'
   gem.add_development_dependency 'faker'
-  gem.app_development_dependency 'codeclimate-test-reporter'
+  gem.add_development_dependency 'codeclimate-test-reporter'
 
 end
