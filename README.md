@@ -1,12 +1,11 @@
 [![Version](http://allthebadges.io/jwaldrip/memory_model/badge_fury.png)](http://allthebadges.io/jwaldrip/memory_model/badge_fury)
-[![Dependencies](http://allthebadges.io/jwaldrip/memory_model/gemnasium.png)](http://allthebadges.io/jwaldrip/memory_model/gemnasium)
 [![Build Status](http://allthebadges.io/jwaldrip/memory_model/travis.png)](http://allthebadges.io/jwaldrip/memory_model/travis)
 [![Coverage](http://allthebadges.io/jwaldrip/memory_model/coveralls.png)](http://allthebadges.io/jwaldrip/memory_model/coveralls)
 [![Code Climate](http://allthebadges.io/jwaldrip/memory_model/code_climate.png)](http://allthebadges.io/jwaldrip/memory_model/code_climate)
 
 # MemoryModel
 
-TODO: Write a gem description
+An in memory model construct. Good for testing.
 
 ## Installation
 
@@ -24,7 +23,44 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Creating a basic model
+
+```ruby
+class User < MemoryModel::Base
+    primary_key :id
+    
+    field :first_name
+    field :last_name
+end
+```
+
+### Creating Records
+
+```ruby
+User.create(first_name: 'jason')
+
+# OR
+
+User.new(first_name: 'jason').save
+```
+
+### Finding Records
+
+```ruby
+User.find(id)
+```
+
+### Updating Records
+
+```ruby
+User.find(id).update(first_name: 'larry')
+```
+
+### Deleting Records
+
+```ruby
+User.find(id).delete
+```
 
 ## Contributing
 
