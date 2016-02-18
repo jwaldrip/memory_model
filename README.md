@@ -1,9 +1,9 @@
-[![Version](http://allthebadges.io/jwaldrip/memory_model/badge_fury.png)](http://allthebadges.io/jwaldrip/memory_model/badge_fury)
-[![Build Status](http://allthebadges.io/jwaldrip/memory_model/travis.png)](http://allthebadges.io/jwaldrip/memory_model/travis)
-[![Coverage](http://allthebadges.io/jwaldrip/memory_model/coveralls.png)](http://allthebadges.io/jwaldrip/memory_model/coveralls)
-[![Code Climate](http://allthebadges.io/jwaldrip/memory_model/code_climate.png)](http://allthebadges.io/jwaldrip/memory_model/code_climate)
-
 # MemoryModel
+
+[![Gem Version](https://badge.fury.io/rb/memory_model.svg)](https://badge.fury.io/rb/jsonapionify)
+[![Build Status](https://travis-ci.org/jwaldrip/memory_model.svg?branch=master)](https://travis-ci.org/brandfolder/jsonapionify)
+[![Code Climate](https://codeclimate.com/github/jwaldrip/memory_model/badges/gpa.svg)](https://codeclimate.com/github/jwaldrip/memory_model)
+[![Test Coverage](https://codeclimate.com/github/jwaldrip/memory_model/badges/coverage.svg)](https://codeclimate.com/github/jwaldrip/memory_model/coverage)
 
 An in memory model construct. Good for testing.
 

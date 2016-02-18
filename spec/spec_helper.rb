@@ -1,15 +1,9 @@
-require 'simplecov'
-require 'coveralls'
-
 require 'rspec/autorun'
 require 'bundler/setup'
 require 'pry'
 
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  SimpleCov::Formatter::HTMLFormatter,
-  Coveralls::SimpleCov::Formatter
-]
-SimpleCov.start
+require 'codeclimate-test-reporter'
+CodeClimate::TestReporter.start
 
 require 'memory_model'
 

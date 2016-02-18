@@ -33,5 +33,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'pry'
   gem.add_development_dependency 'colorize'
   gem.add_development_dependency 'faker'
+  gem.app_development_dependency 'codeclimate-test-reporter'
 
 end
